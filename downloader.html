@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Video Downloader | Sadik Tool's</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #02040a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        #bg-glow-ball {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 75%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            filter: blur(40px);
+            left: -500px;
+            top: -500px;
+            transition: transform 0.05s ease-out;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.35);
+        }
+        .btn-action {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            transition: all 0.2s ease;
+        }
+        .btn-action:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+
+    <canvas id="bg-canvas"></canvas>
+    <div id="bg-glow-ball"></div>
+
+    <!-- Header -->
+    <header class="glass-card rounded-2xl p-4 mb-8 flex justify-between items-center max-w-6xl mx-auto w-full relative z-10">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">📥</span>
+            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Social Video Downloader</h1>
+        </div>
+        <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition active:scale-95">← Back Home</a>
+    </header>
+
+    <!-- Main Downloader Workspace -->
+    <main class="max-w-2xl mx-auto w-full mb-12 relative z-10 space-y-6">
+
+        <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 text-center">
+            <div class="text-4xl mb-2">🎬</div>
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Professional Video Downloader</h2>
+            <p class="text-gray-400 text-sm">TikTok, Instagram Reels, YouTube বা Facebook ভিডিওর লিংক নিচে পেস্ট করো।</p>
+            
+            <div class="flex flex-col md:flex-row gap-3">
+                <input type="url" id="video-url" placeholder="এখানে ভিডিওর লিংক দিন (https://...)" class="flex-1 bg-black/40 border border-white/15 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-blue-400">
+                <button onclick="processDownload()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg">Fetch Video</button>
+            </div>
+        </div>
+
+        <!-- Result Preview Box -->
+        <div id="result-box" class="glass-card rounded-3xl p-6 hidden space-y-4 text-center">
+            <div class="text-3xl">🚀</div>
+            <h3 class="text-lg font-semibold text-emerald-400">ভিডিও ডাউনলোডের জন্য প্রস্তুত!</h3>
+            <p class="text-xs text-gray-300" id="display-url-text"></p>
+            <a id="direct-dl-btn" href="#" target="_blank" class="block w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-bold text-white shadow-lg transition">📥 Download Video Now (HD)</a>
+        </div>
+
+    </main>
+
+    <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
+        <p>© 2026 Sadik Tool's • Video Downloader Module</p>
+    </footer>
+
+    <script>
+        function processDownload() {
+            const urlInput = document.getElementById('video-url').value.trim();
+            const resultBox = document.getElementById('result-box');
+            const displayUrlText = document.getElementById('display-url-text');
+            const directDlBtn = document.getElementById('direct-dl-btn');
+
+            if (!urlInput) {
+                alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
+                return;
+            }
+
+            resultBox.classList.remove('hidden');
+            displayUrlText.innerText = "লিংক: " + urlInput;
+            
+            // Generate direct safe redirect link to high speed downloader service
+            let targetServiceUrl = `https://en.savefrom.net/#url=${encodeURIComponent(urlInput)}`;
+            if (urlInput.includes('tiktok')) {
+                targetServiceUrl = `https://tikmate.app/en/?url=${encodeURIComponent(urlInput)}`;
+            }
+            
+            directDlBtn.href = targetServiceUrl;
+        }
+
+        // Background Animation Script
+        const glowBall = document.getElementById('bg-glow-ball');
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2, radius: 200 };
+
+        function updatePointer(x, y) {
+            pointer.x = x;
+            pointer.y = y;
+            if (glowBall) {
+                glowBall.style.left = x + 'px';
+                glowBall.style.top = y + 'px';
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => { updatePointer(e.clientX, e.clientY); });
+        window.addEventListener('touchmove', (e) => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+        window.addEventListener('touchstart', (e) => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+
+        const particles = [];
+        for (let i = 0; i < 140; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2.8 + 1,
+                vx: (Math.random() - 0.5) * 0.9,
+                vy: (Math.random() - 0.5) * 0.9,
+                color: Math.random() > 0.4 ? 'rgba(96, 165, 250, 0.8)' : 'rgba(167, 139, 250, 0.8)'
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                let dx = pointer.x - p.x;
+                let dy = pointer.y - p.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < pointer.radius) {
+                    let cacheForce = (pointer.radius - distance) / pointer.radius;
+                    p.x += (dx / distance) * cacheForce * 4;
+                    p.y += (dy / distance) * cacheForce * 4;
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(96, 165, 250, ${cacheForce * 0.4})`;
+                    ctx.lineWidth = 0.9;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(pointer.x, pointer.y);
+                    ctx.stroke();
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#60a5fa';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
