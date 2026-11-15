@@ -78,13 +78,13 @@
             </div>
         </div>
 
-        <!-- Quality & Audio Selection Box (YTDown Style) -->
+        <!-- Quality & Audio Selection Box -->
         <div id="quality-box" class="glass-card rounded-3xl p-6 hidden space-y-4">
             <div class="flex items-center space-x-3 border-b border-white/10 pb-3">
                 <div id="video-thumb" class="w-16 h-16 bg-black/60 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0">🎥</div>
                 <div class="text-left overflow-hidden">
                     <h3 id="video-title" class="text-sm font-semibold text-white truncate">Media Ready</h3>
-                    <p class="text-xs text-amber-400 mt-0.5">● নিচের যেকোনো একটি ফরম্যাটে ক্লিক করুন</p>
+                    <p class="text-xs text-amber-400 mt-0.5">● কোয়ালিটি সিলেক্ট করুন</p>
                 </div>
             </div>
 
@@ -92,69 +92,40 @@
             <div class="space-y-2">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1">Video (MP4)</p>
                 
-                <button onclick="startApiDownload('1080', 'MP4 1080p FHD')" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
+                <a id="dl-1080" href="#" target="_blank" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
                     <span>MP4 - (1920x1080 FHD)</span>
-                    <span class="w-5 h-5 rounded-full border-2 border-amber-400 flex items-center justify-center"><span class="w-2.5 h-2.5 bg-amber-400 rounded-full"></span></span>
-                </button>
+                    <span class="w-5 h-5 rounded-full border-2 border-amber-400 flex items-center justify-center p-0.5"><span class="w-full h-full bg-amber-400 rounded-full"></span></span>
+                </a>
 
-                <button onclick="startApiDownload('720', 'MP4 720p HD')" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
+                <a id="dl-720" href="#" target="_blank" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
                     <span>MP4 - (1280x720 HD)</span>
                     <span class="w-5 h-5 rounded-full border-2 border-gray-500"></span>
-                </button>
+                </a>
 
-                <button onclick="startApiDownload('480', 'MP4 480p SD')" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
+                <a id="dl-480" href="#" target="_blank" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
                     <span>MP4 - (854x480 SD)</span>
                     <span class="w-5 h-5 rounded-full border-2 border-gray-500"></span>
-                </button>
-
-                <button onclick="startApiDownload('360', 'MP4 360p SD')" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
-                    <span>MP4 - (640x360 SD)</span>
-                    <span class="w-5 h-5 rounded-full border-2 border-gray-500"></span>
-                </button>
+                </a>
             </div>
 
             <!-- Audio Formats -->
             <div class="space-y-2 pt-2 border-t border-white/10">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1">Audio</p>
 
-                <button onclick="startApiDownload('mp3', 'Audio MP3 (128K)')" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
+                <a id="dl-mp3" href="#" target="_blank" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
                     <span>MP3 - (128K High Quality)</span>
                     <span class="w-5 h-5 rounded-full border-2 border-gray-500"></span>
-                </button>
-
-                <button onclick="startApiDownload('m4a', 'Audio M4A (128K)')" class="quality-item w-full flex items-center justify-between p-3.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium transition">
-                    <span>M4A - (128K Original)</span>
-                    <span class="w-5 h-5 rounded-full border-2 border-gray-500"></span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Download Progress & Final Button Box -->
-        <div id="status-box" class="glass-card rounded-3xl p-6 hidden space-y-4 text-center">
-            <h3 id="status-title" class="text-base font-bold text-blue-300">⏳ ফাইল প্রস্তুত হচ্ছে...</h3>
-            
-            <!-- Progress Bar -->
-            <div class="w-full bg-black/50 rounded-full h-3 overflow-hidden border border-white/10">
-                <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full transition-all duration-300" style="width: 10%"></div>
-            </div>
-            <p id="status-text" class="text-xs text-gray-300">সার্ভারে রিকোয়েস্ট পাঠানো হচ্ছে (10%)...</p>
-
-            <!-- Final Download Button -->
-            <div id="final-btn-container" class="hidden pt-2">
-                <a id="final-download-link" href="#" target="_blank" download class="block w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 rounded-xl font-bold text-white shadow-lg transition">📥 Save File to Device</a>
+                </a>
             </div>
         </div>
 
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Powered by High-Speed Media API</p>
+        <p>© 2026 Sadik Tool's • High-Speed Downloader Hub</p>
     </footer>
 
     <script>
-        const API_KEY = "91abd14b11f27747e0f979c5bdbe7536f021d284";
-        let pollTimer = null;
-
         function extractYouTubeID(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -169,101 +140,28 @@
             }
 
             const qualityBox = document.getElementById('quality-box');
-            const statusBox = document.getElementById('status-box');
             const videoTitle = document.getElementById('video-title');
             const videoThumb = document.getElementById('video-thumb');
 
-            statusBox.classList.add('hidden');
             qualityBox.classList.remove('hidden');
+            qualityBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            // If YouTube link, show real thumbnail preview immediately
+            // Thumbnail and Title setup
             const ytId = extractYouTubeID(urlInput);
             if (ytId) {
                 videoThumb.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" class="w-full h-full object-cover">`;
                 videoTitle.innerText = "YouTube Video (" + ytId + ")";
             } else {
                 videoThumb.innerHTML = `🎬`;
-                videoTitle.innerText = urlInput;
+                videoTitle.innerText = "Social Media Video";
             }
-        }
 
-        async function startApiDownload(format, label) {
-            const urlInput = document.getElementById('video-url').value.trim();
-            if (!urlInput) return;
-
-            if (pollTimer) clearInterval(pollTimer);
-
-            const statusBox = document.getElementById('status-box');
-            const statusTitle = document.getElementById('status-title');
-            const statusText = document.getElementById('status-text');
-            const progressBar = document.getElementById('progress-bar');
-            const finalBtnContainer = document.getElementById('final-btn-container');
-            const finalDownloadLink = document.getElementById('final-download-link');
-
-            statusBox.classList.remove('hidden');
-            finalBtnContainer.classList.add('hidden');
-            statusTitle.innerText = `⏳ ${label} তৈরি হচ্ছে...`;
-            progressBar.style.width = '15%';
-            statusText.innerText = 'API সার্ভারে সংযোগ করা হচ্ছে...';
-
-            // Scroll smoothly to status box
-            statusBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            try {
-                const initUrl = `https://p.savenow.to/ajax/download.php?format=${encodeURIComponent(format)}&url=${encodeURIComponent(urlInput)}&api=${API_KEY}`;
-                const response = await fetch(initUrl);
-                const data = await response.json();
-
-                if (data && data.success && data.id) {
-                    if (data.title) {
-                        document.getElementById('video-title').innerText = data.title;
-                    }
-                    if (data.info && data.info.image) {
-                        document.getElementById('video-thumb').innerHTML = `<img src="${data.info.image}" class="w-full h-full object-cover">`;
-                    }
-
-                    // Poll progress endpoint until download_url is ready
-                    const progressUrl = data.progress_url || `https://p.savenow.to/api/progress?id=${data.id}`;
-                    
-                    pollTimer = setInterval(async () => {
-                        try {
-                            const progRes = await fetch(progressUrl);
-                            const progData = await progRes.json();
-
-                            // Progress in this API usually scales up to 1000
-                            let percent = Math.min(98, Math.round((progData.progress || 100) / 10));
-                            if (percent < 20) percent = 25;
-
-                            progressBar.style.width = percent + '%';
-                            statusText.innerText = `${progData.text || 'কনভার্ট হচ্ছে'} (${percent}%)...`;
-
-                            if (progData.download_url) {
-                                clearInterval(pollTimer);
-                                progressBar.style.width = '100%';
-                                statusTitle.innerText = "✅ ডাউনলোডের জন্য একদম প্রস্তুত!";
-                                statusText.innerText = `${label} সফলভাবে তৈরি হয়েছে।`;
-                                
-                                finalDownloadLink.href = progData.download_url;
-                                finalBtnContainer.classList.remove('hidden');
-                            } else if (progData.success === 0 && progData.text && progData.text.toLowerCase().includes('error')) {
-                                clearInterval(pollTimer);
-                                statusTitle.innerText = "❌ সমস্যা হয়েছে";
-                                statusText.innerText = progData.text;
-                            }
-                        } catch (err) {
-                            // Keep polling silently on minor network hiccup
-                        }
-                    }, 2000);
-
-                } else {
-                    throw new Error(data.message || 'API রিকোয়েস্ট ব্যর্থ হয়েছে');
-                }
-            } catch (error) {
-                statusTitle.innerText = "⚠️ কানেকশন এরর";
-                statusText.innerText = "লিঙ্কটি সাপোর্ট করছে না অথবা API লিমিট শেষ হয়েছে। অন্য লিঙ্ক দিয়ে চেষ্টা করুন।";
-                progressBar.style.width = '100%';
-                progressBar.classList.replace('from-blue-500', 'from-red-500');
-            }
+            // Direct safe server links configuration
+            const encodedUrl = encodeURIComponent(urlInput);
+            document.getElementById('dl-1080').href = `https://en.savefrom.net/#url=${encodedUrl}`;
+            document.getElementById('dl-720').href = `https://en.savefrom.net/#url=${encodedUrl}`;
+            document.getElementById('dl-480').href = `https://en.savefrom.net/#url=${encodedUrl}`;
+            document.getElementById('dl-mp3').href = `https://en.savefrom.net/#url=${encodedUrl}`;
         }
 
         // Background Particle Animation Script
@@ -342,5 +240,4 @@
         animate();
     </script>
 </body>
-    </html>
-    
+</html>
