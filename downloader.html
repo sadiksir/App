@@ -73,18 +73,19 @@
         <!-- Instance Settings Box -->
         <div class="glass-card rounded-3xl p-5 md:p-6 space-y-3">
             <button type="button" onclick="toggleSettings()" class="w-full flex justify-between items-center text-xs text-gray-400 font-semibold">
-                <span>⚙️ Cobalt ইনস্ট্যান্স সেটিংস</span>
-                <span id="settings-caret">▸</span>
+                <span>⚙️ cobalt ইনস্ট্যান্স সেটিংস (প্রথমবার বসাও)</span>
+                <span id="settings-caret">▾</span>
             </button>
-            <div id="settings-body" class="space-y-3 pt-1 hidden">
+            <div id="settings-body" class="space-y-3 pt-1">
                 <div>
                     <label class="text-[11px] text-gray-500 block mb-1">Cobalt instance URL</label>
-                    <input type="url" id="instance-url" value="https://cobalt.meowing.de" placeholder="https://cobalt.meowing.de" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
+                    <input type="url" id="instance-url" placeholder="https://your-cobalt-instance.example.com" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
                 </div>
                 <div>
-                    <label class="text-[11px] text-gray-500 block mb-1">API Key (প্রয়োজন হলে)</label>
+                    <label class="text-[11px] text-gray-500 block mb-1">API Key (ইনস্ট্যান্সে key লাগলে, না লাগলে খালি রাখো)</label>
                     <input type="text" id="instance-key" placeholder="Api-Key xxxxxxxx" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
                 </div>
+                <p class="text-[10px] text-gray-500 leading-relaxed">নিজের ফ্রি instance চালাতে <a href="https://github.com/wukko/cobalt" target="_blank" rel="noopener" class="text-blue-400 underline">github.com/wukko/cobalt</a> দেখো, অথবা টেস্টের জন্য <a href="https://instances.cobalt.best" target="_blank" rel="noopener" class="text-blue-400 underline">instances.cobalt.best</a> থেকে একটা পাবলিক instance বেছে নাও।</p>
                 <button type="button" onclick="saveInstanceSettings()" class="w-full py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-semibold">সেভ করো</button>
             </div>
         </div>
@@ -92,31 +93,25 @@
         <!-- Link Input Box -->
         <div class="glass-card rounded-3xl p-6 md:p-8 space-y-5 text-center">
             <div class="text-4xl">🎬</div>
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Video & Audio Downloader</h2>
-            <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে কোয়ালিটি বা অডিও বেছে নিন।</p>
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Video Downloader</h2>
+            <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে ফেচ করুন।</p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="text-[11px] text-gray-400 block mb-1 text-left">ভিডিও কোয়ালিটি</label>
-                    <select id="video-quality" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-blue-400">
-                        <option value="1080" selected>1080p (Full HD)</option>
-                        <option value="720">720p (HD)</option>
-                        <option value="480">480p (SD)</option>
-                        <option value="360">360p</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[11px] text-gray-400 block mb-1 text-left">ডাউনলোড মোড</label>
-                    <select id="download-mode" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-3 text-white text-xs focus:outline-none focus:border-blue-400">
-                        <option value="auto" selected>ভিডিও + অডিও (Auto)</option>
-                        <option value="audio">শুধুমাত্র অডিও (MP3)</option>
-                    </select>
-                </div>
+            <div>
+                <label class="text-[11px] text-gray-500 block mb-1 text-left">ভিডিও কোয়ালিটি</label>
+                <select id="video-quality" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-400">
+                    <option value="2160">2160p (4K)</option>
+                    <option value="1440">1440p</option>
+                    <option value="1080" selected>1080p</option>
+                    <option value="720">720p</option>
+                    <option value="480">480p</option>
+                    <option value="360">360p</option>
+                    <option value="144">144p</option>
+                </select>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="url" id="video-url" placeholder="ভিডিওর লিংক পেস্ট করুন (https://...)" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-blue-400">
-                <button id="fetch-btn" onclick="fetchVideoFromCobalt()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Media</button>
+                <button id="fetch-btn" onclick="fetchVideoFromCobalt()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Video</button>
             </div>
         </div>
 
@@ -130,10 +125,25 @@
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Powered by Cobalt</p>
+        <p>© 2026 Sadik Tool's • Powered by cobalt</p>
     </footer>
 
     <script>
+        // ====================================================================
+        // এই ডাউনলোডারটা cobalt (https://github.com/wukko/cobalt) ব্যবহার করে —
+        // এটা ওপেন-সোর্স, ফ্রি, আর YouTube/TikTok/Instagram/Facebook/Twitter সহ
+        // ২০+ প্ল্যাটফর্ম সাপোর্ট করে।
+        //
+        // জরুরি: cobalt-এর নিজস্ব পাবলিক instance (api.cobalt.tools) অন্য প্রজেক্টে
+        // সরাসরি ব্যবহারের জন্য না (ওদের ডকুমেন্টেশনেই লেখা আছে) — তাই এখানে সেটা
+        // হার্ডকোড করিনি। এর বদলে উপরের "cobalt ইনস্ট্যান্স সেটিংস" বক্সে তুমি
+        // নিজের instance URL বসাবে:
+        //   ১) নিজে হোস্ট করতে চাইলে: github.com/wukko/cobalt (Docker দিয়ে ফ্রি,
+        //      Render/Koyeb/নিজের VPS-এ কয়েক মিনিটে বসে)
+        //   ২) দ্রুত টেস্ট করতে চাইলে: instances.cobalt.best থেকে একটা পাবলিক
+        //      instance বেছে URL বসিয়ে দাও
+        // ====================================================================
+
         const fetchBtn = document.getElementById('fetch-btn');
         const settingsBody = document.getElementById('settings-body');
         const settingsCaret = document.getElementById('settings-caret');
@@ -145,27 +155,32 @@
 
         function loadInstanceSettings() {
             try {
-                const savedUrl = localStorage.getItem('cobalt_instance_url');
-                document.getElementById('instance-url').value = savedUrl || 'https://cobalt.meowing.de';
+                document.getElementById('instance-url').value = localStorage.getItem('cobalt_instance_url') || '';
                 document.getElementById('instance-key').value = localStorage.getItem('cobalt_instance_key') || '';
-            } catch (e) {}
+            } catch (e) { /* private browsing ইত্যাদিতে localStorage না থাকলেও যেন ক্র্যাশ না করে */ }
         }
-
         function saveInstanceSettings() {
             try {
                 localStorage.setItem('cobalt_instance_url', document.getElementById('instance-url').value.trim());
                 localStorage.setItem('cobalt_instance_key', document.getElementById('instance-key').value.trim());
             } catch (e) {}
             toggleSettings();
-            alert('সেটিংস সফলভাবে সেভ হয়েছে!');
+            alert('সেভ হয়েছে।');
         }
         loadInstanceSettings();
+        // প্রথমবার instance বসানো না থাকলে সেটিংস বক্স খোলা রাখো
+        if (!document.getElementById('instance-url').value) {
+            settingsBody.classList.remove('hidden');
+            settingsCaret.textContent = '▾';
+        } else {
+            settingsBody.classList.add('hidden');
+            settingsCaret.textContent = '▸';
+        }
 
         async function fetchVideoFromCobalt() {
             const urlInput = document.getElementById('video-url').value.trim();
             const quality = document.getElementById('video-quality').value;
-            const mode = document.getElementById('download-mode').value;
-            const instanceUrl = (document.getElementById('instance-url').value.trim() || 'https://cobalt.meowing.de').replace(/\/+$/, '');
+            const instanceUrl = document.getElementById('instance-url').value.trim().replace(/\/+$/, '');
             const instanceKey = document.getElementById('instance-key').value.trim();
             const resultBox = document.getElementById('result-box');
             const resultContent = document.getElementById('result-content');
@@ -174,13 +189,18 @@
                 alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
                 return;
             }
+            if (!instanceUrl) {
+                alert('আগে উপরের "cobalt ইনস্ট্যান্স সেটিংস" বক্সে একটা instance URL বসাও।');
+                toggleSettings();
+                return;
+            }
 
             fetchBtn.disabled = true;
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
                 <div class="text-3xl animate-bounce">⏳</div>
-                <h3 class="text-base font-bold text-amber-400">মিডিয়া প্রসেস হচ্ছে...</h3>
-                <p class="text-xs text-gray-300">দয়া করে কয়েক সেকেন্ড অপেক্ষা করুন।</p>
+                <h3 class="text-base font-bold text-amber-400">ভিডিও খোঁজা হচ্ছে...</h3>
+                <p class="text-xs text-gray-300">এতে কয়েক সেকেন্ড সময় লাগতে পারে।</p>
             `;
 
             const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
@@ -193,28 +213,31 @@
                     body: JSON.stringify({
                         url: urlInput,
                         videoQuality: quality,
-                        downloadMode: mode,
+                        downloadMode: 'auto',
                         filenameStyle: 'pretty'
                     })
                 });
 
                 const data = await res.json().catch(() => null);
-                if (!data) throw new Error(`সার্ভার থেকে সঠিক রেসপন্স আসেনি (স্ট্যাটাস ${res.status})।`);
+                console.log('cobalt raw result:', data);
+
+                if (!data) throw new Error(`সার্ভার থেকে বৈধ JSON রেসপন্স আসেনি (স্ট্যাটাস ${res.status})।`);
 
                 renderResult(data, urlInput);
             } catch (err) {
                 console.error(err);
                 resultContent.innerHTML = `
                     <div class="text-3xl">❌</div>
-                    <h3 class="text-base font-bold text-red-400">ডাউনলোড লিংক তৈরি করা যায়নি</h3>
+                    <h3 class="text-base font-bold text-red-400">ফেচ করা যায়নি</h3>
                     <p class="text-xs text-gray-300 break-all">${escapeHtml(err.message || 'অজানা এরর')}</p>
-                    <p class="text-xs text-gray-500 mt-2">লিংকটি সঠিক আছে কিনা চেক করুন অথবা ইনস্ট্যান্স ইউআরএল পরিবর্তন করে দেখুন।</p>
+                    <p class="text-xs text-gray-500 mt-2">instance URL ঠিক আছে কিনা, আর F12 কনসোলে CORS এরর আসছে কিনা দেখো। CORS ব্লক হলে ওই instance-টা browser থেকে ব্যবহারের অনুমতি দিচ্ছে না — অন্য instance ট্রাই করো বা নিজের instance হোস্ট করো।</p>
                 `;
             } finally {
                 fetchBtn.disabled = false;
             }
         }
 
+        // cobalt-এর রেসপন্স সবসময় status ফিল্ড দিয়ে আসে: error, redirect, tunnel বা picker
         function renderResult(data, originalUrl) {
             const resultContent = document.getElementById('result-content');
 
@@ -222,9 +245,9 @@
                 const code = data.error && data.error.code ? data.error.code : 'unknown';
                 resultContent.innerHTML = `
                     <div class="text-3xl">⚠️</div>
-                    <h3 class="text-base font-bold text-amber-400">এরর দেখা দিয়েছে</h3>
-                    <p class="text-xs text-gray-300 break-all">কোড: ${escapeHtml(code)}</p>
-                    <p class="text-xs text-gray-500 mt-2">এই লিংকটি সাপোর্ট করছে না অথবা ভিডিওটি প্রাইভেট।</p>
+                    <h3 class="text-base font-bold text-amber-400">cobalt এরর দিয়েছে</h3>
+                    <p class="text-xs text-gray-300 break-all">${escapeHtml(code)}</p>
+                    <p class="text-xs text-gray-500 mt-2">এই প্ল্যাটফর্ম/লিংক সাপোর্ট করছে না, অথবা instance-এ key লাগছে, অথবা ভিডিওটা প্রাইভেট/অনেক বড়।</p>
                 `;
                 return;
             }
@@ -232,11 +255,11 @@
             if (data.status === 'redirect' || data.status === 'tunnel') {
                 resultContent.innerHTML = `
                     <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">ফাইল প্রস্তুত!</h3>
+                    <h3 class="text-base font-bold text-emerald-400">ভিডিও পাওয়া গেছে!</h3>
                     <p class="text-xs text-gray-400 break-all">সোর্স: ${escapeHtml(originalUrl)}</p>
-                    <a href="${data.url}" target="_blank" rel="noopener" download="${escapeHtml(data.filename || 'media')}"
-                       class="quality-btn block w-full py-3.5 rounded-xl font-semibold text-white text-sm bg-blue-600/40 hover:bg-blue-600/60 border border-blue-400/40">
-                       ⬇️ সরাসরি ডাউনলোড করুন (${escapeHtml(data.filename || 'File')})
+                    <a href="${data.url}" target="_blank" rel="noopener" download="${escapeHtml(data.filename || 'video')}"
+                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
+                       ⬇️ ${escapeHtml(data.filename || 'ডাউনলোড করুন')}
                     </a>
                 `;
                 return;
@@ -246,13 +269,18 @@
                 const items = data.picker.map((p, i) => `
                     <a href="${p.url}" target="_blank" rel="noopener" download
                        class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
-                       ⬇️ ডাউনলোড অপশন ${i + 1} (${escapeHtml(p.type || 'Media')})
+                       ⬇️ ${escapeHtml(p.type || ('আইটেম ' + (i + 1)))}
                     </a>
                 `).join('');
+                const audio = data.audio ? `
+                    <a href="${data.audio}" target="_blank" rel="noopener" download
+                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
+                       🎵 অডিও ডাউনলোড করুন
+                    </a>` : '';
                 resultContent.innerHTML = `
                     <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">একাধিক ফরম্যাট পাওয়া গেছে</h3>
-                    <div class="space-y-2 pt-2">${items}</div>
+                    <h3 class="text-base font-bold text-emerald-400">একাধিক আইটেম পাওয়া গেছে</h3>
+                    <div class="space-y-2 pt-2">${items}${audio}</div>
                 `;
                 return;
             }
@@ -260,7 +288,7 @@
             resultContent.innerHTML = `
                 <div class="text-3xl">🤔</div>
                 <h3 class="text-base font-bold text-amber-400">অচেনা রেসপন্স</h3>
-                <pre class="text-left text-[10px] bg-black/50 rounded-lg p-3 overflow-auto max-h-48 mt-2">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+                <pre class="text-left text-[10px] bg-black/50 rounded-lg p-3 overflow-auto max-h-48 mt-2">${escapeHtml(JSON.stringify(data, null, 2)).slice(0, 2000)}</pre>
             `;
         }
 
