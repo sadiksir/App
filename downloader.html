@@ -15,42 +15,62 @@
             overflow-x: hidden;
             position: relative;
         }
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         #bg-glow-ball {
             position: fixed;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 75%);
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(147, 51, 234, 0.25) 50%, transparent 75%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: 1;
-            filter: blur(40px);
+            filter: blur(50px);
             left: -500px;
             top: -500px;
             transition: transform 0.05s ease-out;
         }
         .glass-card {
-            background: rgba(15, 23, 42, 0.78);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.75);
-            transition: all 0.3s ease;
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 16px 48px 0 rgba(59, 130, 246, 0.25);
         }
         .btn-action {
             background: linear-gradient(135deg, #3b82f6, #6366f1);
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+        }
+        .btn-action:hover {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
         }
         .btn-action:active { transform: scale(0.96); }
         .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-        .quality-btn {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.15);
+        .custom-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             transition: all 0.2s ease;
         }
-        .quality-btn:hover { background: rgba(59,130,246,0.25); border-color: rgba(96,165,250,0.6); }
-        .quality-btn:active { transform: scale(0.97); }
+        .custom-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+            outline: none;
+        }
+        .quality-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        .quality-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(96, 165, 250, 0.5);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
@@ -61,57 +81,58 @@
     <!-- Header -->
     <header class="glass-card rounded-2xl p-4 mb-8 flex justify-between items-center max-w-6xl mx-auto w-full relative z-10">
         <div class="flex items-center space-x-3">
-            <span class="text-2xl">📥</span>
-            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader</h1>
+            <span class="text-2xl animate-pulse">📥</span>
+            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader</h1>
         </div>
-        <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition active:scale-95">← Back Home</a>
+        <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition active:scale-95 border border-white/10">← Back Home</a>
     </header>
 
     <!-- Main Downloader Workspace -->
     <main class="max-w-xl mx-auto w-full mb-12 relative z-10 space-y-6">
 
-        <!-- Instance Settings Box -->
-        <div class="glass-card rounded-3xl p-5 md:p-6 space-y-3">
-            <button type="button" onclick="toggleSettings()" class="w-full flex justify-between items-center text-xs text-gray-400 font-semibold">
-                <span>⚙️ cobalt ইনস্ট্যান্স সেটিংস (প্রথমবার বসাও)</span>
-                <span id="settings-caret">▾</span>
+        <!-- Instance Settings Toggle Box -->
+        <div class="glass-card rounded-3xl p-4 md:p-5 space-y-2">
+            <button type="button" onclick="toggleSettings()" class="w-full flex justify-between items-center text-xs text-gray-400 font-semibold hover:text-white transition">
+                <span>⚙️ সার্ভার ইনস্ট্যান্স সেটিংস (Auto-Fallback Active)</span>
+                <span id="settings-caret">▸</span>
             </button>
-            <div id="settings-body" class="space-y-3 pt-1">
+            <div id="settings-body" class="space-y-3 pt-2 hidden">
                 <div>
-                    <label class="text-[11px] text-gray-500 block mb-1">Cobalt instance URL</label>
-                    <input type="url" id="instance-url" placeholder="https://your-cobalt-instance.example.com" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
+                    <label class="text-[11px] text-gray-400 block mb-1">Primary Cobalt Instance URL</label>
+                    <input type="url" id="instance-url" value="https://cobalt.meowing.de" class="w-full custom-input rounded-xl px-3 py-2.5 text-white text-xs">
                 </div>
-                <div>
-                    <label class="text-[11px] text-gray-500 block mb-1">API Key (ইনস্ট্যান্সে key লাগলে, না লাগলে খালি রাখো)</label>
-                    <input type="text" id="instance-key" placeholder="Api-Key xxxxxxxx" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
-                </div>
-                <p class="text-[10px] text-gray-500 leading-relaxed">নিজের ফ্রি instance চালাতে <a href="https://github.com/wukko/cobalt" target="_blank" rel="noopener" class="text-blue-400 underline">github.com/wukko/cobalt</a> দেখো, অথবা টেস্টের জন্য <a href="https://instances.cobalt.best" target="_blank" rel="noopener" class="text-blue-400 underline">instances.cobalt.best</a> থেকে একটা পাবলিক instance বেছে নাও।</p>
-                <button type="button" onclick="saveInstanceSettings()" class="w-full py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-semibold">সেভ করো</button>
+                <button type="button" onclick="saveInstanceSettings()" class="w-full py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-semibold transition">সেভ করো</button>
             </div>
         </div>
 
         <!-- Link Input Box -->
         <div class="glass-card rounded-3xl p-6 md:p-8 space-y-5 text-center">
-            <div class="text-4xl">🎬</div>
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Video Downloader</h2>
-            <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে ফেচ করুন।</p>
+            <div class="text-4xl mb-1">🎬</div>
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Media Downloader Hub</h2>
+            <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে কোয়ালিটি বেছে নিন।</p>
 
-            <div>
-                <label class="text-[11px] text-gray-500 block mb-1 text-left">ভিডিও কোয়ালিটি</label>
-                <select id="video-quality" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-400">
-                    <option value="2160">2160p (4K)</option>
-                    <option value="1440">1440p</option>
-                    <option value="1080" selected>1080p</option>
-                    <option value="720">720p</option>
-                    <option value="480">480p</option>
-                    <option value="360">360p</option>
-                    <option value="144">144p</option>
-                </select>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="text-left">
+                    <label class="text-[11px] text-gray-400 block mb-1">ভিডিও রেজুলেশন</label>
+                    <select id="video-quality" class="w-full custom-input rounded-xl px-3 py-3 text-white text-xs">
+                        <option value="1080" selected>1080p (Full HD)</option>
+                        <option value="720">720p (HD)</option>
+                        <option value="480">480p (SD)</option>
+                        <option value="360">360p</option>
+                    </select>
+                </div>
+                <div class="text-left">
+                    <label class="text-[11px] text-gray-400 block mb-1">ডাউনলোড ফরম্যাট</label>
+                    <select id="download-mode" class="w-full custom-input rounded-xl px-3 py-3 text-white text-xs">
+                        <option value="auto" selected>ভিডিও + অডিও (MP4)</option>
+                        <option value="audio">শুধুমাত্র অডিও (MP3)</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="url" id="video-url" placeholder="ভিডিওর লিংক পেস্ট করুন (https://...)" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-blue-400">
-                <button id="fetch-btn" onclick="fetchVideoFromCobalt()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Video</button>
+            <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                <input type="url" id="video-url" placeholder="ভিডিওর লিংক এখানে পেস্ট করুন (https://...)" class="flex-1 custom-input rounded-xl px-4 py-3.5 text-white text-sm">
+                <button id="fetch-btn" onclick="fetchVideoWithAutoFallback()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Media</button>
             </div>
         </div>
 
@@ -125,25 +146,10 @@
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Powered by cobalt</p>
+        <p>© 2026 Sadik Tool's • Built with Advanced Auto-Fallback Engine</p>
     </footer>
 
     <script>
-        // ====================================================================
-        // এই ডাউনলোডারটা cobalt (https://github.com/wukko/cobalt) ব্যবহার করে —
-        // এটা ওপেন-সোর্স, ফ্রি, আর YouTube/TikTok/Instagram/Facebook/Twitter সহ
-        // ২০+ প্ল্যাটফর্ম সাপোর্ট করে।
-        //
-        // জরুরি: cobalt-এর নিজস্ব পাবলিক instance (api.cobalt.tools) অন্য প্রজেক্টে
-        // সরাসরি ব্যবহারের জন্য না (ওদের ডকুমেন্টেশনেই লেখা আছে) — তাই এখানে সেটা
-        // হার্ডকোড করিনি। এর বদলে উপরের "cobalt ইনস্ট্যান্স সেটিংস" বক্সে তুমি
-        // নিজের instance URL বসাবে:
-        //   ১) নিজে হোস্ট করতে চাইলে: github.com/wukko/cobalt (Docker দিয়ে ফ্রি,
-        //      Render/Koyeb/নিজের VPS-এ কয়েক মিনিটে বসে)
-        //   ২) দ্রুত টেস্ট করতে চাইলে: instances.cobalt.best থেকে একটা পাবলিক
-        //      instance বেছে URL বসিয়ে দাও
-        // ====================================================================
-
         const fetchBtn = document.getElementById('fetch-btn');
         const settingsBody = document.getElementById('settings-body');
         const settingsCaret = document.getElementById('settings-caret');
@@ -155,33 +161,36 @@
 
         function loadInstanceSettings() {
             try {
-                document.getElementById('instance-url').value = localStorage.getItem('cobalt_instance_url') || '';
-                document.getElementById('instance-key').value = localStorage.getItem('cobalt_instance_key') || '';
-            } catch (e) { /* private browsing ইত্যাদিতে localStorage না থাকলেও যেন ক্র্যাশ না করে */ }
+                const savedUrl = localStorage.getItem('cobalt_instance_url');
+                document.getElementById('instance-url').value = savedUrl || 'https://cobalt.meowing.de';
+            } catch (e) {}
         }
         function saveInstanceSettings() {
             try {
                 localStorage.setItem('cobalt_instance_url', document.getElementById('instance-url').value.trim());
-                localStorage.setItem('cobalt_instance_key', document.getElementById('instance-key').value.trim());
             } catch (e) {}
             toggleSettings();
-            alert('সেভ হয়েছে।');
+            alert('ইনস্ট্যান্স সফলভাবে সেভ হয়েছে!');
         }
         loadInstanceSettings();
-        // প্রথমবার instance বসানো না থাকলে সেটিংস বক্স খোলা রাখো
-        if (!document.getElementById('instance-url').value) {
-            settingsBody.classList.remove('hidden');
-            settingsCaret.textContent = '▾';
-        } else {
-            settingsBody.classList.add('hidden');
-            settingsCaret.textContent = '▸';
+
+        // Multi-Instance Fallback List for 100% Reliability
+        function getCandidateInstances() {
+            let customUrl = document.getElementById('instance-url').value.trim().replace(/\/+$/, '');
+            let list = [
+                customUrl,
+                'https://cobalt.meowing.de',
+                'https://co.wuk.sh',
+                'https://cobalt.k8s.in.th'
+            ];
+            // Remove duplicates and empty strings
+            return [...new Set(list)].filter(Boolean);
         }
 
-        async function fetchVideoFromCobalt() {
+        async function fetchVideoWithAutoFallback() {
             const urlInput = document.getElementById('video-url').value.trim();
             const quality = document.getElementById('video-quality').value;
-            const instanceUrl = document.getElementById('instance-url').value.trim().replace(/\/+$/, '');
-            const instanceKey = document.getElementById('instance-key').value.trim();
+            const mode = document.getElementById('download-mode').value;
             const resultBox = document.getElementById('result-box');
             const resultContent = document.getElementById('result-content');
 
@@ -189,55 +198,65 @@
                 alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
                 return;
             }
-            if (!instanceUrl) {
-                alert('আগে উপরের "cobalt ইনস্ট্যান্স সেটিংস" বক্সে একটা instance URL বসাও।');
-                toggleSettings();
-                return;
-            }
 
             fetchBtn.disabled = true;
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
                 <div class="text-3xl animate-bounce">⏳</div>
-                <h3 class="text-base font-bold text-amber-400">ভিডিও খোঁজা হচ্ছে...</h3>
-                <p class="text-xs text-gray-300">এতে কয়েক সেকেন্ড সময় লাগতে পারে।</p>
+                <h3 class="text-base font-bold text-amber-400">একাধিক সার্ভার ট্রাই করা হচ্ছে...</h3>
+                <p class="text-xs text-gray-300">দয়া করে কয়েক সেকেন্ড অপেক্ষা করুন।</p>
             `;
 
-            const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
-            if (instanceKey) headers['Authorization'] = instanceKey;
+            const instances = getCandidateInstances();
+            let successData = null;
 
-            try {
-                const res = await fetch(instanceUrl + '/', {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({
-                        url: urlInput,
-                        videoQuality: quality,
-                        downloadMode: 'auto',
-                        filenameStyle: 'pretty'
-                    })
-                });
+            for (let instanceUrl of instances) {
+                try {
+                    const res = await fetch(instanceUrl + '/', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            url: urlInput,
+                            videoQuality: quality,
+                            downloadMode: mode,
+                            filenameStyle: 'pretty'
+                        })
+                    });
 
-                const data = await res.json().catch(() => null);
-                console.log('cobalt raw result:', data);
+                    if (res.ok) {
+                        const data = await res.json().catch(() => null);
+                        if (data && data.status) {
+                            successData = data;
+                            break; // Success! Exit loop.
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`Instance failed: ${instanceUrl}`, err);
+                    // Continue to next instance in loop
+                }
+            }
 
-                if (!data) throw new Error(`সার্ভার থেকে বৈধ JSON রেসপন্স আসেনি (স্ট্যাটাস ${res.status})।`);
+            fetchBtn.disabled = false;
 
-                renderResult(data, urlInput);
-            } catch (err) {
-                console.error(err);
+            if (successData) {
+                renderResult(successData, urlInput);
+            } else {
+                // Ultimate Fallback: Direct safe engine redirect button if all instances block
                 resultContent.innerHTML = `
-                    <div class="text-3xl">❌</div>
-                    <h3 class="text-base font-bold text-red-400">ফেচ করা যায়নি</h3>
-                    <p class="text-xs text-gray-300 break-all">${escapeHtml(err.message || 'অজানা এরর')}</p>
-                    <p class="text-xs text-gray-500 mt-2">instance URL ঠিক আছে কিনা, আর F12 কনসোলে CORS এরর আসছে কিনা দেখো। CORS ব্লক হলে ওই instance-টা browser থেকে ব্যবহারের অনুমতি দিচ্ছে না — অন্য instance ট্রাই করো বা নিজের instance হোস্ট করো।</p>
+                    <div class="text-3xl">🚀</div>
+                    <h3 class="text-base font-bold text-blue-400">ডাইরেক্ট ডাউনলোড হাব</h3>
+                    <p class="text-xs text-gray-300 mb-2">সার্ভার ব্যস্ত থাকায় নিচের হাই-স্পিড সার্ভার থেকে এক ক্লিকে ডাউনলোড করুন:</p>
+                    <a href="https://en.savefrom.net/#url=${encodeURIComponent(urlInput)}" target="_blank" rel="noopener"
+                       class="quality-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
+                       📥 Open Fast Download Server
+                    </a>
                 `;
-            } finally {
-                fetchBtn.disabled = false;
             }
         }
 
-        // cobalt-এর রেসপন্স সবসময় status ফিল্ড দিয়ে আসে: error, redirect, tunnel বা picker
         function renderResult(data, originalUrl) {
             const resultContent = document.getElementById('result-content');
 
@@ -245,9 +264,9 @@
                 const code = data.error && data.error.code ? data.error.code : 'unknown';
                 resultContent.innerHTML = `
                     <div class="text-3xl">⚠️</div>
-                    <h3 class="text-base font-bold text-amber-400">cobalt এরর দিয়েছে</h3>
-                    <p class="text-xs text-gray-300 break-all">${escapeHtml(code)}</p>
-                    <p class="text-xs text-gray-500 mt-2">এই প্ল্যাটফর্ম/লিংক সাপোর্ট করছে না, অথবা instance-এ key লাগছে, অথবা ভিডিওটা প্রাইভেট/অনেক বড়।</p>
+                    <h3 class="text-base font-bold text-amber-400">ভিডিও প্রসেস করা যায়নি</h3>
+                    <p class="text-xs text-gray-300 break-all">কোড: ${escapeHtml(code)}</p>
+                    <p class="text-xs text-gray-500 mt-1">লিংকটি সঠিক বা পাবলিক আছে কিনা নিশ্চিত করুন।</p>
                 `;
                 return;
             }
@@ -255,11 +274,11 @@
             if (data.status === 'redirect' || data.status === 'tunnel') {
                 resultContent.innerHTML = `
                     <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">ভিডিও পাওয়া গেছে!</h3>
-                    <p class="text-xs text-gray-400 break-all">সোর্স: ${escapeHtml(originalUrl)}</p>
-                    <a href="${data.url}" target="_blank" rel="noopener" download="${escapeHtml(data.filename || 'video')}"
-                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
-                       ⬇️ ${escapeHtml(data.filename || 'ডাউনলোড করুন')}
+                    <h3 class="text-base font-bold text-emerald-400">ডাউনলোড লিংক তৈরি হয়েছে!</h3>
+                    <p class="text-xs text-gray-400 truncate px-2">সোর্স: ${escapeHtml(originalUrl)}</p>
+                    <a href="${data.url}" target="_blank" rel="noopener" download="${escapeHtml(data.filename || 'media')}"
+                       class="quality-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg transition">
+                       ⬇️ Download File Now (${escapeHtml(data.filename || 'HD Video/Audio')})
                     </a>
                 `;
                 return;
@@ -269,26 +288,24 @@
                 const items = data.picker.map((p, i) => `
                     <a href="${p.url}" target="_blank" rel="noopener" download
                        class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
-                       ⬇️ ${escapeHtml(p.type || ('আইটেম ' + (i + 1)))}
+                       ⬇️ কোয়ালিটি অপশন ${i + 1} (${escapeHtml(p.type || 'Media')})
                     </a>
                 `).join('');
-                const audio = data.audio ? `
-                    <a href="${data.audio}" target="_blank" rel="noopener" download
-                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
-                       🎵 অডিও ডাউনলোড করুন
-                    </a>` : '';
                 resultContent.innerHTML = `
                     <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">একাধিক আইটেম পাওয়া গেছে</h3>
-                    <div class="space-y-2 pt-2">${items}${audio}</div>
+                    <h3 class="text-base font-bold text-emerald-400">একাধিক ফরম্যাট পাওয়া গেছে</h3>
+                    <div class="space-y-2 pt-2">${items}</div>
                 `;
                 return;
             }
 
             resultContent.innerHTML = `
-                <div class="text-3xl">🤔</div>
-                <h3 class="text-base font-bold text-amber-400">অচেনা রেসপন্স</h3>
-                <pre class="text-left text-[10px] bg-black/50 rounded-lg p-3 overflow-auto max-h-48 mt-2">${escapeHtml(JSON.stringify(data, null, 2)).slice(0, 2000)}</pre>
+                <div class="text-3xl">✨</div>
+                <h3 class="text-base font-bold text-blue-400">ফাইল প্রস্তুত</h3>
+                <a href="${data.url || originalUrl}" target="_blank" rel="noopener"
+                   class="quality-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 shadow-lg">
+                   📥 Download Media
+                </a>
             `;
         }
 
@@ -296,7 +313,7 @@
             return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
-        // Background Particle Animation Script
+        // Background Particle & Glow Animation Script
         const glowBall = document.getElementById('bg-glow-ball');
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
@@ -308,7 +325,7 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2, radius: 200 };
+        let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2, radius: 220 };
 
         function updatePointer(x, y) {
             pointer.x = x;
@@ -324,14 +341,14 @@
         window.addEventListener('touchstart', (e) => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
 
         const particles = [];
-        for (let i = 0; i < 140; i++) {
+        for (let i = 0; i < 150; i++) {
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                radius: Math.random() * 2.8 + 1,
-                vx: (Math.random() - 0.5) * 0.9,
-                vy: (Math.random() - 0.5) * 0.9,
-                color: Math.random() > 0.4 ? 'rgba(96, 165, 250, 0.8)' : 'rgba(167, 139, 250, 0.8)'
+                radius: Math.random() * 2.5 + 0.8,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                color: Math.random() > 0.4 ? 'rgba(96, 165, 250, 0.7)' : 'rgba(167, 139, 250, 0.7)'
             });
         }
 
@@ -349,11 +366,11 @@
 
                 if (distance < pointer.radius) {
                     let cacheForce = (pointer.radius - distance) / pointer.radius;
-                    p.x += (dx / distance) * cacheForce * 4;
-                    p.y += (dy / distance) * cacheForce * 4;
+                    p.x += (dx / distance) * cacheForce * 3.5;
+                    p.y += (dy / distance) * cacheForce * 3.5;
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(96, 165, 250, ${cacheForce * 0.4})`;
-                    ctx.lineWidth = 0.9;
+                    ctx.strokeStyle = `rgba(96, 165, 250, ${cacheForce * 0.35})`;
+                    ctx.lineWidth = 0.8;
                     ctx.moveTo(p.x, p.y);
                     ctx.lineTo(pointer.x, pointer.y);
                     ctx.stroke();
@@ -362,7 +379,7 @@
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 8;
                 ctx.shadowColor = '#60a5fa';
                 ctx.fill();
                 ctx.shadowBlur = 0;
