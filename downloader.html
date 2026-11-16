@@ -43,6 +43,14 @@
             transition: all 0.2s ease;
         }
         .btn-action:active { transform: scale(0.96); }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quality-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s ease;
+        }
+        .quality-btn:hover { background: rgba(59,130,246,0.25); border-color: rgba(96,165,250,0.6); }
+        .quality-btn:active { transform: scale(0.97); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
@@ -67,10 +75,10 @@
             <div class="text-4xl">🎬</div>
             <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Apify Video Downloader</h2>
             <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে ফেচ করুন।</p>
-            
+
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="url" id="video-url" placeholder="ভিডিওর লিংক পেস্ট করুন (https://...)" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-blue-400">
-                <button onclick="fetchVideoFromApify()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Video</button>
+                <button id="fetch-btn" onclick="fetchVideoFromApify()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Video</button>
             </div>
         </div>
 
@@ -88,9 +96,16 @@
     </footer>
 
     <script>
-        // তোমার দেওয়া Apify Actor ইনফরমেশন এখানে সেট করা হলো
-        const API_TOKEN = 'apify_api_YOUR_TOKEN_HERE'; // চাইলে তোমার টোকেন এখানে দিতে পারো
-        const ACTOR_ID = 'andryerica~all-video-downloader';
+        // ====== এখানে তোমার আসল Apify টোকেন আর অ্যাক্টর আইডি বসাও ======
+        const API_TOKEN = 'apify_api_YOUR_TOKEN_HERE'; // Apify Console > Settings > Integrations থেকে নাও
+        const ACTOR_ID  = 'andryerica~all-video-downloader'; // তোমার অ্যাক্টরের আইডি
+
+        // সতর্কতা: এই টোকেন ব্রাউজারের সোর্স কোডে প্রকাশ্য থাকে। যে কেউ "View Source"
+        // করে এটা দেখে নিজের কাজে ব্যবহার করতে পারবে (তোমার Apify ক্রেডিট খরচ হবে)।
+        // পাবলিকলি শেয়ার করা সাইটে এটা না রাখাই ভালো — পরে প্রক্সি/ব্যাকএন্ড সরানোর
+        // পরামর্শ নিচে কথোপকথনেই দেওয়া আছে।
+
+        const fetchBtn = document.getElementById('fetch-btn');
 
         async function fetchVideoFromApify() {
             const urlInput = document.getElementById('video-url').value.trim();
@@ -98,27 +113,127 @@
             const resultContent = document.getElementById('result-content');
 
             if (!urlInput) {
-                alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
+                alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
+                return;
+            }
+            if (!API_TOKEN || API_TOKEN === 'apify_api_YOUR_TOKEN_HERE') {
+                alert('আগে তোমার আসল Apify API টোকেন বসাও কোডের ভেতরে (API_TOKEN ভেরিয়েবলে)।');
                 return;
             }
 
+            fetchBtn.disabled = true;
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
                 <div class="text-3xl animate-bounce">⏳</div>
                 <h3 class="text-base font-bold text-amber-400">অ্যাক্টর রান হচ্ছে...</h3>
-                <p class="text-xs text-gray-300">দয়া করে একটু অপেক্ষা করুন, ভিডিও ডেটা ফেচ করা হচ্ছে।</p>
+                <p class="text-xs text-gray-300">এতে কিছুক্ষণ সময় লাগতে পারে (সাধারণত ৫–৩০ সেকেন্ড)।</p>
             `;
 
-            // যেহেতু ক্লায়েন্ট সাইড থেকে সরাসরি Apify কল করলে CORS প্রবলেম হতে পারে, 
-            // তাই সবচেয়ে নিরাপদ মাধ্যম হিসেবে আমরা ডাইরেক্ট সেফ ডাউনলোডার রিডাইরেক্ট বা ব্যাকআপ লিংক জেনারেট করে দিচ্ছি:
-            setTimeout(() => {
+            const endpoint = `https://api.apify.com/v2/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`;
+
+            // ভিন্ন ভিন্ন অ্যাক্টরের ইনপুট ফিল্ডের নাম ভিন্ন হয় (urls, startUrls, videoUrl ইত্যাদি)।
+            // তোমার অ্যাক্টরের Apify কনসোলে "Input" ট্যাবে গিয়ে ঠিক ফিল্ডের নাম দেখে নাও,
+            // দরকার হলে নিচের অবজেক্টে সেই নাম বসাও।
+            const requestBody = {
+                urls: [urlInput],
+                startUrls: [{ url: urlInput }],
+                url: urlInput
+            };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text().catch(() => '');
+                    throw new Error(`Apify থেকে এরর এসেছে (স্ট্যাটাস ${res.status}): ${errText.slice(0, 200)}`);
+                }
+
+                const items = await res.json();
+                console.log('Apify raw result:', items);
+
+                if (!Array.isArray(items) || items.length === 0) {
+                    resultContent.innerHTML = `
+                        <div class="text-3xl">⚠️</div>
+                        <h3 class="text-base font-bold text-amber-400">কোনো রেজাল্ট পাওয়া যায়নি</h3>
+                        <p class="text-xs text-gray-300">লিংকটা সঠিক কিনা, বা Actor-এর ইনপুট ফিল্ড নাম মিলছে কিনা চেক করো।</p>
+                    `;
+                    return;
+                }
+
+                renderResult(items[0], urlInput);
+            } catch (err) {
+                console.error(err);
                 resultContent.innerHTML = `
-                    <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">ভিডিও প্রসেস সম্পন্ন হয়েছে!</h3>
-                    <p class="text-xs text-gray-300 break-all">লিংক: ${urlInput}</p>
-                    <a href="https://en.savefrom.net/#url=${encodeURIComponent(urlInput)}" target="_blank" class="block w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-bold text-white shadow-lg transition mt-3">📥 Download Video Now (HD)</a>
+                    <div class="text-3xl">❌</div>
+                    <h3 class="text-base font-bold text-red-400">ফেচ করা যায়নি</h3>
+                    <p class="text-xs text-gray-300 break-all">${(err.message || 'অজানা এরর').toString()}</p>
+                    <p class="text-xs text-gray-500 mt-2">টোকেন/অ্যাক্টর আইডি ঠিক আছে কিনা, আর ব্রাউজার কনসোল (F12) এ CORS এরর আসছে কিনা দেখো। CORS ব্লক হলে একটা ছোট ব্যাকএন্ড প্রক্সি লাগবে।</p>
                 `;
-            }, 1200);
+            } finally {
+                fetchBtn.disabled = false;
+            }
+        }
+
+        // Apify actor-ভেদে আউটপুটের shape আলাদা হয়। এখানে সবচেয়ে কমন কয়েকটা
+        // ফিল্ড-নাম চেষ্টা করে দেখা হচ্ছে; মিল না পেলে raw JSON দেখিয়ে দেবে,
+        // যাতে তুমি F12 কনসোলে real field নাম দেখে এই ফাংশনটা টিউন করতে পারো।
+        function renderResult(item, originalUrl) {
+            const resultContent = document.getElementById('result-content');
+
+            // সম্ভাব্য ফরম্যাট/কোয়ালিটি লিস্ট বের করার চেষ্টা
+            let formats = [];
+            if (Array.isArray(item.formats)) {
+                formats = item.formats.map(f => ({
+                    label: f.quality || f.label || f.resolution || 'Video',
+                    url: f.url || f.downloadUrl
+                }));
+            } else if (Array.isArray(item.medias)) {
+                formats = item.medias.map(f => ({
+                    label: f.quality || f.type || 'Video',
+                    url: f.url || f.downloadUrl
+                }));
+            } else if (item.downloadUrl || item.videoUrl || item.video_url || item.hdUrl || item.sdUrl) {
+                if (item.hdUrl) formats.push({ label: 'HD', url: item.hdUrl });
+                if (item.sdUrl) formats.push({ label: 'SD', url: item.sdUrl });
+                if (item.downloadUrl) formats.push({ label: 'Download', url: item.downloadUrl });
+                if (item.videoUrl) formats.push({ label: 'Video', url: item.videoUrl });
+                if (item.video_url) formats.push({ label: 'Video', url: item.video_url });
+            }
+            formats = formats.filter(f => f.url);
+
+            if (formats.length === 0) {
+                resultContent.innerHTML = `
+                    <div class="text-3xl">🤔</div>
+                    <h3 class="text-base font-bold text-amber-400">ভিডিও লিংক খুঁজে পাওয়া যায়নি</h3>
+                    <p class="text-xs text-gray-300">Actor থেকে ডেটা এসেছে, কিন্তু কোন ফিল্ডে ভিডিও লিংক আছে বোঝা যাচ্ছে না।</p>
+                    <p class="text-xs text-gray-500 mt-2">ব্রাউজারে F12 চেপে Console ট্যাবে "Apify raw result" লেখাটার পাশে পুরো ডেটা দেখো, সেখান থেকে সঠিক ফিল্ডের নাম renderResult() ফাংশনে যোগ করো।</p>
+                    <pre class="text-left text-[10px] bg-black/50 rounded-lg p-3 overflow-auto max-h-48 mt-2">${escapeHtml(JSON.stringify(item, null, 2)).slice(0, 2000)}</pre>
+                `;
+                return;
+            }
+
+            const buttonsHtml = formats.map(f => `
+                <a href="${f.url}" target="_blank" rel="noopener" download
+                   class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
+                   ⬇️ ${f.label} ডাউনলোড করুন
+                </a>
+            `).join('');
+
+            resultContent.innerHTML = `
+                <div class="text-3xl">✅</div>
+                <h3 class="text-base font-bold text-emerald-400">ভিডিও পাওয়া গেছে!</h3>
+                <p class="text-xs text-gray-400 break-all">সোর্স: ${escapeHtml(originalUrl)}</p>
+                <div class="space-y-2 pt-2">${buttonsHtml}</div>
+                <p class="text-[10px] text-gray-500 pt-2">নোট: এই লিংকগুলো সরাসরি সোর্স সার্ভার থেকে আসে, তাই কোনো কোনো ব্রাউজারে ক্লিক করলে নতুন ট্যাবে ভিডিও চালু হতে পারে — সেখান থেকে ডান-ক্লিক করে "Save video as" করো।</p>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
         // Background Particle Animation Script
