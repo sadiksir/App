@@ -31,16 +31,22 @@
             transition: transform 0.05s ease-out;
         }
         .glass-card {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.78);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
-        .glass-card:hover {
-            border-color: rgba(96, 165, 250, 0.4);
-            box-shadow: 0 16px 48px 0 rgba(59, 130, 246, 0.25);
+        .platform-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        .platform-btn:hover, .platform-btn.active {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(96, 165, 250, 0.6);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
         }
         .btn-action {
             background: linear-gradient(135deg, #3b82f6, #6366f1);
@@ -48,7 +54,7 @@
         }
         .btn-action:hover {
             background: linear-gradient(135deg, #2563eb, #4f46e5);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
         }
         .btn-action:active { transform: scale(0.96); }
         .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -62,15 +68,6 @@
             box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
             outline: none;
         }
-        .quality-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s ease;
-        }
-        .quality-btn:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(96, 165, 250, 0.5);
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
@@ -79,7 +76,7 @@
     <div id="bg-glow-ball"></div>
 
     <!-- Header -->
-    <header class="glass-card rounded-2xl p-4 mb-8 flex justify-between items-center max-w-6xl mx-auto w-full relative z-10">
+    <header class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center max-w-6xl mx-auto w-full relative z-10">
         <div class="flex items-center space-x-3">
             <span class="text-2xl animate-pulse">📥</span>
             <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader</h1>
@@ -87,52 +84,39 @@
         <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition active:scale-95 border border-white/10">← Back Home</a>
     </header>
 
-    <!-- Main Downloader Workspace -->
+    <!-- Main Workspace -->
     <main class="max-w-xl mx-auto w-full mb-12 relative z-10 space-y-6">
 
-        <!-- Instance Settings Toggle Box -->
-        <div class="glass-card rounded-3xl p-4 md:p-5 space-y-2">
-            <button type="button" onclick="toggleSettings()" class="w-full flex justify-between items-center text-xs text-gray-400 font-semibold hover:text-white transition">
-                <span>⚙️ সার্ভার ইনস্ট্যান্স সেটিংস (Auto-Fallback Active)</span>
-                <span id="settings-caret">▸</span>
-            </button>
-            <div id="settings-body" class="space-y-3 pt-2 hidden">
-                <div>
-                    <label class="text-[11px] text-gray-400 block mb-1">Primary Cobalt Instance URL</label>
-                    <input type="url" id="instance-url" value="https://cobalt.meowing.de" class="w-full custom-input rounded-xl px-3 py-2.5 text-white text-xs">
-                </div>
-                <button type="button" onclick="saveInstanceSettings()" class="w-full py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-semibold transition">সেভ করো</button>
-            </div>
-        </div>
+        <!-- Platform Selection Cards -->
+        <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 text-center">
+            <div class="text-3xl">🎬</div>
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Select Platform & Download</h2>
+            <p class="text-gray-400 text-xs md:text-sm">নিচে থেকে প্ল্যাটফর্ম সিলেক্ট করে ভিডিওর লিংক পেস্ট করুন।</p>
 
-        <!-- Link Input Box -->
-        <div class="glass-card rounded-3xl p-6 md:p-8 space-y-5 text-center">
-            <div class="text-4xl mb-1">🎬</div>
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Media Downloader Hub</h2>
-            <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে কোয়ালিটি বেছে নিন।</p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div class="text-left">
-                    <label class="text-[11px] text-gray-400 block mb-1">ভিডিও রেজুলেশন</label>
-                    <select id="video-quality" class="w-full custom-input rounded-xl px-3 py-3 text-white text-xs">
-                        <option value="1080" selected>1080p (Full HD)</option>
-                        <option value="720">720p (HD)</option>
-                        <option value="480">480p (SD)</option>
-                        <option value="360">360p</option>
-                    </select>
-                </div>
-                <div class="text-left">
-                    <label class="text-[11px] text-gray-400 block mb-1">ডাউনলোড ফরম্যাট</label>
-                    <select id="download-mode" class="w-full custom-input rounded-xl px-3 py-3 text-white text-xs">
-                        <option value="auto" selected>ভিডিও + অডিও (MP4)</option>
-                        <option value="audio">শুধুমাত্র অডিও (MP3)</option>
-                    </select>
-                </div>
+            <!-- Platform Buttons Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button type="button" onclick="selectPlatform('youtube', this)" class="platform-btn active p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
+                    <span class="text-2xl">🔴</span>
+                    <span class="text-xs font-semibold text-white">YouTube</span>
+                </button>
+                <button type="button" onclick="selectPlatform('tiktok', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
+                    <span class="text-2xl">⚫</span>
+                    <span class="text-xs font-semibold text-white">TikTok</span>
+                </button>
+                <button type="button" onclick="selectPlatform('instagram', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
+                    <span class="text-2xl">🟣</span>
+                    <span class="text-xs font-semibold text-white">Instagram</span>
+                </button>
+                <button type="button" onclick="selectPlatform('facebook', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
+                    <span class="text-2xl">🔵</span>
+                    <span class="text-xs font-semibold text-white">Facebook</span>
+                </button>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 pt-1">
-                <input type="url" id="video-url" placeholder="ভিডিওর লিংক এখানে পেস্ট করুন (https://...)" class="flex-1 custom-input rounded-xl px-4 py-3.5 text-white text-sm">
-                <button id="fetch-btn" onclick="fetchVideoWithAutoFallback()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Media</button>
+            <!-- Input & Fetch Button -->
+            <div class="space-y-3 pt-2">
+                <input type="url" id="video-url" placeholder="এখানে ভিডিওর লিংক দিন (https://...)" class="w-full custom-input rounded-xl px-4 py-3.5 text-white text-sm">
+                <button id="fetch-btn" onclick="fetchVideoWithApify()" class="btn-action w-full py-3.5 rounded-xl font-bold text-white shadow-lg text-sm">Fetch & Generate Download</button>
             </div>
         </div>
 
@@ -146,53 +130,29 @@
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Built with Advanced Auto-Fallback Engine</p>
+        <p>© 2026 Sadik Tool's • Powered by Apify API</p>
     </footer>
 
     <script>
-        const fetchBtn = document.getElementById('fetch-btn');
-        const settingsBody = document.getElementById('settings-body');
-        const settingsCaret = document.getElementById('settings-caret');
+        let selectedPlatform = 'youtube';
 
-        function toggleSettings() {
-            settingsBody.classList.toggle('hidden');
-            settingsCaret.textContent = settingsBody.classList.contains('hidden') ? '▸' : '▾';
+        function selectPlatform(platform, btnElement) {
+            selectedPlatform = platform;
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const inputField = document.getElementById('video-url');
+            if (platform === 'youtube') inputField.placeholder = "YouTube লিংক দিন (https://youtube.com/...)";
+            else if (platform === 'tiktok') inputField.placeholder = "TikTok লিংক দিন (https://tiktok.com/...)";
+            else if (platform === 'instagram') inputField.placeholder = "Instagram Reeling লিংক দিন...";
+            else if (platform === 'facebook') inputField.placeholder = "Facebook ভিডিও লিংক দিন...";
         }
 
-        function loadInstanceSettings() {
-            try {
-                const savedUrl = localStorage.getItem('cobalt_instance_url');
-                document.getElementById('instance-url').value = savedUrl || 'https://cobalt.meowing.de';
-            } catch (e) {}
-        }
-        function saveInstanceSettings() {
-            try {
-                localStorage.setItem('cobalt_instance_url', document.getElementById('instance-url').value.trim());
-            } catch (e) {}
-            toggleSettings();
-            alert('ইনস্ট্যান্স সফলভাবে সেভ হয়েছে!');
-        }
-        loadInstanceSettings();
-
-        // Multi-Instance Fallback List for 100% Reliability
-        function getCandidateInstances() {
-            let customUrl = document.getElementById('instance-url').value.trim().replace(/\/+$/, '');
-            let list = [
-                customUrl,
-                'https://cobalt.meowing.de',
-                'https://co.wuk.sh',
-                'https://cobalt.k8s.in.th'
-            ];
-            // Remove duplicates and empty strings
-            return [...new Set(list)].filter(Boolean);
-        }
-
-        async function fetchVideoWithAutoFallback() {
+        async function fetchVideoWithApify() {
             const urlInput = document.getElementById('video-url').value.trim();
-            const quality = document.getElementById('video-quality').value;
-            const mode = document.getElementById('download-mode').value;
             const resultBox = document.getElementById('result-box');
             const resultContent = document.getElementById('result-content');
+            const fetchBtn = document.getElementById('fetch-btn');
 
             if (!urlInput) {
                 alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
@@ -203,108 +163,71 @@
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
                 <div class="text-3xl animate-bounce">⏳</div>
-                <h3 class="text-base font-bold text-amber-400">একাধিক সার্ভার ট্রাই করা হচ্ছে...</h3>
-                <p class="text-xs text-gray-300">দয়া করে কয়েক সেকেন্ড অপেক্ষা করুন।</p>
+                <h3 class="text-base font-bold text-amber-400">Apify সার্ভার প্রসেস করছে...</h3>
+                <p class="text-xs text-gray-300">ভিডিওর ডেটা সংগ্রহ করতে ১০-১৫ সেকেন্ড সময় লাগতে পারে।</p>
             `;
 
-            const instances = getCandidateInstances();
-            let successData = null;
+            const API_TOKEN = 'apify_api_5pMYXnDPwTtgqUKJ4gm8o95S78oOjf0SoxNg';
+            const ACTOR_ID = 'wilcode~all-social-media-video-downloader';
+            const endpoint = `https://api.apify.com/v2/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`;
 
-            for (let instanceUrl of instances) {
-                try {
-                    const res = await fetch(instanceUrl + '/', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: urlInput,
+                        proxySettings: {
+                            useApifyProxy: true,
+                            apifyProxyGroups: ["RESIDENTIAL"],
+                            apifyProxyCountry: "CA"
                         },
-                        body: JSON.stringify({
-                            url: urlInput,
-                            videoQuality: quality,
-                            downloadMode: mode,
-                            filenameStyle: 'pretty'
-                        })
-                    });
+                        mergeAV: false
+                    })
+                });
 
-                    if (res.ok) {
-                        const data = await res.json().catch(() => null);
-                        if (data && data.status) {
-                            successData = data;
-                            break; // Success! Exit loop.
-                        }
-                    }
-                } catch (err) {
-                    console.warn(`Instance failed: ${instanceUrl}`, err);
-                    // Continue to next instance in loop
+                if (!response.ok) throw new Error('Apify API রিকোয়েস্ট ব্যর্থ হয়েছে।');
+
+                const items = await response.json();
+                
+                if (items && items.length > 0) {
+                    renderApifyResults(items[0], urlInput);
+                } else {
+                    throw new Error('কোনো মিডিয়া ডেটা পাওয়া যায়নি।');
                 }
-            }
-
-            fetchBtn.disabled = false;
-
-            if (successData) {
-                renderResult(successData, urlInput);
-            } else {
-                // Ultimate Fallback: Direct safe engine redirect button if all instances block
+            } catch (err) {
+                console.error(err);
+                // Safe Fallback Redirect if API takes time or blocks
                 resultContent.innerHTML = `
                     <div class="text-3xl">🚀</div>
                     <h3 class="text-base font-bold text-blue-400">ডাইরেক্ট ডাউনলোড হাব</h3>
-                    <p class="text-xs text-gray-300 mb-2">সার্ভার ব্যস্ত থাকায় নিচের হাই-স্পিড সার্ভার থেকে এক ক্লিকে ডাউনলোড করুন:</p>
+                    <p class="text-xs text-gray-300 mb-2">সার্ভার থেকে সরাসরি ফেচ করতে সমস্যা হলে নিচের লিংকে ক্লিক করুন:</p>
                     <a href="https://en.savefrom.net/#url=${encodeURIComponent(urlInput)}" target="_blank" rel="noopener"
-                       class="quality-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
+                       class="platform-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 shadow-lg">
                        📥 Open Fast Download Server
                     </a>
                 `;
+            } finally {
+                fetchBtn.disabled = false;
             }
         }
 
-        function renderResult(data, originalUrl) {
+        function renderApifyResults(item, originalUrl) {
             const resultContent = document.getElementById('result-content');
+            let downloadUrl = item.url || item.videoUrl || item.downloadUrl || originalUrl;
+            let title = item.title || "Social Media Video";
+            let thumb = item.thumbnail || item.thumb || "";
 
-            if (data.status === 'error') {
-                const code = data.error && data.error.code ? data.error.code : 'unknown';
-                resultContent.innerHTML = `
-                    <div class="text-3xl">⚠️</div>
-                    <h3 class="text-base font-bold text-amber-400">ভিডিও প্রসেস করা যায়নি</h3>
-                    <p class="text-xs text-gray-300 break-all">কোড: ${escapeHtml(code)}</p>
-                    <p class="text-xs text-gray-500 mt-1">লিংকটি সঠিক বা পাবলিক আছে কিনা নিশ্চিত করুন।</p>
-                `;
-                return;
-            }
-
-            if (data.status === 'redirect' || data.status === 'tunnel') {
-                resultContent.innerHTML = `
-                    <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">ডাউনলোড লিংক তৈরি হয়েছে!</h3>
-                    <p class="text-xs text-gray-400 truncate px-2">সোর্স: ${escapeHtml(originalUrl)}</p>
-                    <a href="${data.url}" target="_blank" rel="noopener" download="${escapeHtml(data.filename || 'media')}"
-                       class="quality-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg transition">
-                       ⬇️ Download File Now (${escapeHtml(data.filename || 'HD Video/Audio')})
-                    </a>
-                `;
-                return;
-            }
-
-            if (data.status === 'picker' && Array.isArray(data.picker)) {
-                const items = data.picker.map((p, i) => `
-                    <a href="${p.url}" target="_blank" rel="noopener" download
-                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
-                       ⬇️ কোয়ালিটি অপশন ${i + 1} (${escapeHtml(p.type || 'Media')})
-                    </a>
-                `).join('');
-                resultContent.innerHTML = `
-                    <div class="text-3xl">✅</div>
-                    <h3 class="text-base font-bold text-emerald-400">একাধিক ফরম্যাট পাওয়া গেছে</h3>
-                    <div class="space-y-2 pt-2">${items}</div>
-                `;
-                return;
-            }
+            let thumbHtml = thumb ? `<img src="${thumb}" class="w-full h-36 object-cover rounded-xl mb-3">` : '';
 
             resultContent.innerHTML = `
-                <div class="text-3xl">✨</div>
-                <h3 class="text-base font-bold text-blue-400">ফাইল প্রস্তুত</h3>
-                <a href="${data.url || originalUrl}" target="_blank" rel="noopener"
-                   class="quality-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 shadow-lg">
-                   📥 Download Media
+                <div class="text-3xl">✅</div>
+                <h3 class="text-base font-bold text-emerald-400">ভিডিও সফলভাবে প্রস্তুত!</h3>
+                ${thumbHtml}
+                <p class="text-xs text-gray-300 font-medium line-clamp-2 px-1">${escapeHtml(title)}</p>
+                <a href="${downloadUrl}" target="_blank" rel="noopener" download
+                   class="platform-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg mt-2">
+                   ⬇️ Download Video File Now
                 </a>
             `;
         }
