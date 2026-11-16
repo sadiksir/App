@@ -70,15 +70,48 @@
     <!-- Main Downloader Workspace -->
     <main class="max-w-xl mx-auto w-full mb-12 relative z-10 space-y-6">
 
+        <!-- Instance Settings Box -->
+        <div class="glass-card rounded-3xl p-5 md:p-6 space-y-3">
+            <button type="button" onclick="toggleSettings()" class="w-full flex justify-between items-center text-xs text-gray-400 font-semibold">
+                <span>⚙️ cobalt ইনস্ট্যান্স সেটিংস (প্রথমবার বসাও)</span>
+                <span id="settings-caret">▾</span>
+            </button>
+            <div id="settings-body" class="space-y-3 pt-1">
+                <div>
+                    <label class="text-[11px] text-gray-500 block mb-1">Cobalt instance URL</label>
+                    <input type="url" id="instance-url" placeholder="https://your-cobalt-instance.example.com" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                    <label class="text-[11px] text-gray-500 block mb-1">API Key (ইনস্ট্যান্সে key লাগলে, না লাগলে খালি রাখো)</label>
+                    <input type="text" id="instance-key" placeholder="Api-Key xxxxxxxx" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-blue-400">
+                </div>
+                <p class="text-[10px] text-gray-500 leading-relaxed">নিজের ফ্রি instance চালাতে <a href="https://github.com/wukko/cobalt" target="_blank" rel="noopener" class="text-blue-400 underline">github.com/wukko/cobalt</a> দেখো, অথবা টেস্টের জন্য <a href="https://instances.cobalt.best" target="_blank" rel="noopener" class="text-blue-400 underline">instances.cobalt.best</a> থেকে একটা পাবলিক instance বেছে নাও।</p>
+                <button type="button" onclick="saveInstanceSettings()" class="w-full py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-semibold">সেভ করো</button>
+            </div>
+        </div>
+
         <!-- Link Input Box -->
         <div class="glass-card rounded-3xl p-6 md:p-8 space-y-5 text-center">
             <div class="text-4xl">🎬</div>
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Apify Video Downloader</h2>
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Video Downloader</h2>
             <p class="text-gray-400 text-xs md:text-sm">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক লিংক পেস্ট করে ফেচ করুন।</p>
+
+            <div>
+                <label class="text-[11px] text-gray-500 block mb-1 text-left">ভিডিও কোয়ালিটি</label>
+                <select id="video-quality" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-400">
+                    <option value="2160">2160p (4K)</option>
+                    <option value="1440">1440p</option>
+                    <option value="1080" selected>1080p</option>
+                    <option value="720">720p</option>
+                    <option value="480">480p</option>
+                    <option value="360">360p</option>
+                    <option value="144">144p</option>
+                </select>
+            </div>
 
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="url" id="video-url" placeholder="ভিডিওর লিংক পেস্ট করুন (https://...)" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-blue-400">
-                <button id="fetch-btn" onclick="fetchVideoFromApify()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Video</button>
+                <button id="fetch-btn" onclick="fetchVideoFromCobalt()" class="btn-action px-6 py-3.5 rounded-xl font-bold text-white shadow-lg text-sm whitespace-nowrap">Fetch Video</button>
             </div>
         </div>
 
@@ -92,23 +125,63 @@
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Powered by Apify Actor</p>
+        <p>© 2026 Sadik Tool's • Powered by cobalt</p>
     </footer>
 
     <script>
-        // ====== এখানে তোমার আসল Apify টোকেন আর অ্যাক্টর আইডি বসাও ======
-        const API_TOKEN = 'apify_api_YOUR_TOKEN_HERE'; // Apify Console > Settings > Integrations থেকে নাও
-        const ACTOR_ID  = 'andryerica~all-video-downloader'; // তোমার অ্যাক্টরের আইডি
-
-        // সতর্কতা: এই টোকেন ব্রাউজারের সোর্স কোডে প্রকাশ্য থাকে। যে কেউ "View Source"
-        // করে এটা দেখে নিজের কাজে ব্যবহার করতে পারবে (তোমার Apify ক্রেডিট খরচ হবে)।
-        // পাবলিকলি শেয়ার করা সাইটে এটা না রাখাই ভালো — পরে প্রক্সি/ব্যাকএন্ড সরানোর
-        // পরামর্শ নিচে কথোপকথনেই দেওয়া আছে।
+        // ====================================================================
+        // এই ডাউনলোডারটা cobalt (https://github.com/wukko/cobalt) ব্যবহার করে —
+        // এটা ওপেন-সোর্স, ফ্রি, আর YouTube/TikTok/Instagram/Facebook/Twitter সহ
+        // ২০+ প্ল্যাটফর্ম সাপোর্ট করে।
+        //
+        // জরুরি: cobalt-এর নিজস্ব পাবলিক instance (api.cobalt.tools) অন্য প্রজেক্টে
+        // সরাসরি ব্যবহারের জন্য না (ওদের ডকুমেন্টেশনেই লেখা আছে) — তাই এখানে সেটা
+        // হার্ডকোড করিনি। এর বদলে উপরের "cobalt ইনস্ট্যান্স সেটিংস" বক্সে তুমি
+        // নিজের instance URL বসাবে:
+        //   ১) নিজে হোস্ট করতে চাইলে: github.com/wukko/cobalt (Docker দিয়ে ফ্রি,
+        //      Render/Koyeb/নিজের VPS-এ কয়েক মিনিটে বসে)
+        //   ২) দ্রুত টেস্ট করতে চাইলে: instances.cobalt.best থেকে একটা পাবলিক
+        //      instance বেছে URL বসিয়ে দাও
+        // ====================================================================
 
         const fetchBtn = document.getElementById('fetch-btn');
+        const settingsBody = document.getElementById('settings-body');
+        const settingsCaret = document.getElementById('settings-caret');
 
-        async function fetchVideoFromApify() {
+        function toggleSettings() {
+            settingsBody.classList.toggle('hidden');
+            settingsCaret.textContent = settingsBody.classList.contains('hidden') ? '▸' : '▾';
+        }
+
+        function loadInstanceSettings() {
+            try {
+                document.getElementById('instance-url').value = localStorage.getItem('cobalt_instance_url') || '';
+                document.getElementById('instance-key').value = localStorage.getItem('cobalt_instance_key') || '';
+            } catch (e) { /* private browsing ইত্যাদিতে localStorage না থাকলেও যেন ক্র্যাশ না করে */ }
+        }
+        function saveInstanceSettings() {
+            try {
+                localStorage.setItem('cobalt_instance_url', document.getElementById('instance-url').value.trim());
+                localStorage.setItem('cobalt_instance_key', document.getElementById('instance-key').value.trim());
+            } catch (e) {}
+            toggleSettings();
+            alert('সেভ হয়েছে।');
+        }
+        loadInstanceSettings();
+        // প্রথমবার instance বসানো না থাকলে সেটিংস বক্স খোলা রাখো
+        if (!document.getElementById('instance-url').value) {
+            settingsBody.classList.remove('hidden');
+            settingsCaret.textContent = '▾';
+        } else {
+            settingsBody.classList.add('hidden');
+            settingsCaret.textContent = '▸';
+        }
+
+        async function fetchVideoFromCobalt() {
             const urlInput = document.getElementById('video-url').value.trim();
+            const quality = document.getElementById('video-quality').value;
+            const instanceUrl = document.getElementById('instance-url').value.trim().replace(/\/+$/, '');
+            const instanceKey = document.getElementById('instance-key').value.trim();
             const resultBox = document.getElementById('result-box');
             const resultContent = document.getElementById('result-content');
 
@@ -116,8 +189,9 @@
                 alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
                 return;
             }
-            if (!API_TOKEN || API_TOKEN === 'apify_api_YOUR_TOKEN_HERE') {
-                alert('আগে তোমার আসল Apify API টোকেন বসাও কোডের ভেতরে (API_TOKEN ভেরিয়েবলে)।');
+            if (!instanceUrl) {
+                alert('আগে উপরের "cobalt ইনস্ট্যান্স সেটিংস" বক্সে একটা instance URL বসাও।');
+                toggleSettings();
                 return;
             }
 
@@ -125,110 +199,96 @@
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
                 <div class="text-3xl animate-bounce">⏳</div>
-                <h3 class="text-base font-bold text-amber-400">অ্যাক্টর রান হচ্ছে...</h3>
-                <p class="text-xs text-gray-300">এতে কিছুক্ষণ সময় লাগতে পারে (সাধারণত ৫–৩০ সেকেন্ড)।</p>
+                <h3 class="text-base font-bold text-amber-400">ভিডিও খোঁজা হচ্ছে...</h3>
+                <p class="text-xs text-gray-300">এতে কয়েক সেকেন্ড সময় লাগতে পারে।</p>
             `;
 
-            const endpoint = `https://api.apify.com/v2/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`;
-
-            // ভিন্ন ভিন্ন অ্যাক্টরের ইনপুট ফিল্ডের নাম ভিন্ন হয় (urls, startUrls, videoUrl ইত্যাদি)।
-            // তোমার অ্যাক্টরের Apify কনসোলে "Input" ট্যাবে গিয়ে ঠিক ফিল্ডের নাম দেখে নাও,
-            // দরকার হলে নিচের অবজেক্টে সেই নাম বসাও।
-            const requestBody = {
-                urls: [urlInput],
-                startUrls: [{ url: urlInput }],
-                url: urlInput
-            };
+            const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
+            if (instanceKey) headers['Authorization'] = instanceKey;
 
             try {
-                const res = await fetch(endpoint, {
+                const res = await fetch(instanceUrl + '/', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
+                    headers: headers,
+                    body: JSON.stringify({
+                        url: urlInput,
+                        videoQuality: quality,
+                        downloadMode: 'auto',
+                        filenameStyle: 'pretty'
+                    })
                 });
 
-                if (!res.ok) {
-                    const errText = await res.text().catch(() => '');
-                    throw new Error(`Apify থেকে এরর এসেছে (স্ট্যাটাস ${res.status}): ${errText.slice(0, 200)}`);
-                }
+                const data = await res.json().catch(() => null);
+                console.log('cobalt raw result:', data);
 
-                const items = await res.json();
-                console.log('Apify raw result:', items);
+                if (!data) throw new Error(`সার্ভার থেকে বৈধ JSON রেসপন্স আসেনি (স্ট্যাটাস ${res.status})।`);
 
-                if (!Array.isArray(items) || items.length === 0) {
-                    resultContent.innerHTML = `
-                        <div class="text-3xl">⚠️</div>
-                        <h3 class="text-base font-bold text-amber-400">কোনো রেজাল্ট পাওয়া যায়নি</h3>
-                        <p class="text-xs text-gray-300">লিংকটা সঠিক কিনা, বা Actor-এর ইনপুট ফিল্ড নাম মিলছে কিনা চেক করো।</p>
-                    `;
-                    return;
-                }
-
-                renderResult(items[0], urlInput);
+                renderResult(data, urlInput);
             } catch (err) {
                 console.error(err);
                 resultContent.innerHTML = `
                     <div class="text-3xl">❌</div>
                     <h3 class="text-base font-bold text-red-400">ফেচ করা যায়নি</h3>
-                    <p class="text-xs text-gray-300 break-all">${(err.message || 'অজানা এরর').toString()}</p>
-                    <p class="text-xs text-gray-500 mt-2">টোকেন/অ্যাক্টর আইডি ঠিক আছে কিনা, আর ব্রাউজার কনসোল (F12) এ CORS এরর আসছে কিনা দেখো। CORS ব্লক হলে একটা ছোট ব্যাকএন্ড প্রক্সি লাগবে।</p>
+                    <p class="text-xs text-gray-300 break-all">${escapeHtml(err.message || 'অজানা এরর')}</p>
+                    <p class="text-xs text-gray-500 mt-2">instance URL ঠিক আছে কিনা, আর F12 কনসোলে CORS এরর আসছে কিনা দেখো। CORS ব্লক হলে ওই instance-টা browser থেকে ব্যবহারের অনুমতি দিচ্ছে না — অন্য instance ট্রাই করো বা নিজের instance হোস্ট করো।</p>
                 `;
             } finally {
                 fetchBtn.disabled = false;
             }
         }
 
-        // Apify actor-ভেদে আউটপুটের shape আলাদা হয়। এখানে সবচেয়ে কমন কয়েকটা
-        // ফিল্ড-নাম চেষ্টা করে দেখা হচ্ছে; মিল না পেলে raw JSON দেখিয়ে দেবে,
-        // যাতে তুমি F12 কনসোলে real field নাম দেখে এই ফাংশনটা টিউন করতে পারো।
-        function renderResult(item, originalUrl) {
+        // cobalt-এর রেসপন্স সবসময় status ফিল্ড দিয়ে আসে: error, redirect, tunnel বা picker
+        function renderResult(data, originalUrl) {
             const resultContent = document.getElementById('result-content');
 
-            // সম্ভাব্য ফরম্যাট/কোয়ালিটি লিস্ট বের করার চেষ্টা
-            let formats = [];
-            if (Array.isArray(item.formats)) {
-                formats = item.formats.map(f => ({
-                    label: f.quality || f.label || f.resolution || 'Video',
-                    url: f.url || f.downloadUrl
-                }));
-            } else if (Array.isArray(item.medias)) {
-                formats = item.medias.map(f => ({
-                    label: f.quality || f.type || 'Video',
-                    url: f.url || f.downloadUrl
-                }));
-            } else if (item.downloadUrl || item.videoUrl || item.video_url || item.hdUrl || item.sdUrl) {
-                if (item.hdUrl) formats.push({ label: 'HD', url: item.hdUrl });
-                if (item.sdUrl) formats.push({ label: 'SD', url: item.sdUrl });
-                if (item.downloadUrl) formats.push({ label: 'Download', url: item.downloadUrl });
-                if (item.videoUrl) formats.push({ label: 'Video', url: item.videoUrl });
-                if (item.video_url) formats.push({ label: 'Video', url: item.video_url });
-            }
-            formats = formats.filter(f => f.url);
-
-            if (formats.length === 0) {
+            if (data.status === 'error') {
+                const code = data.error && data.error.code ? data.error.code : 'unknown';
                 resultContent.innerHTML = `
-                    <div class="text-3xl">🤔</div>
-                    <h3 class="text-base font-bold text-amber-400">ভিডিও লিংক খুঁজে পাওয়া যায়নি</h3>
-                    <p class="text-xs text-gray-300">Actor থেকে ডেটা এসেছে, কিন্তু কোন ফিল্ডে ভিডিও লিংক আছে বোঝা যাচ্ছে না।</p>
-                    <p class="text-xs text-gray-500 mt-2">ব্রাউজারে F12 চেপে Console ট্যাবে "Apify raw result" লেখাটার পাশে পুরো ডেটা দেখো, সেখান থেকে সঠিক ফিল্ডের নাম renderResult() ফাংশনে যোগ করো।</p>
-                    <pre class="text-left text-[10px] bg-black/50 rounded-lg p-3 overflow-auto max-h-48 mt-2">${escapeHtml(JSON.stringify(item, null, 2)).slice(0, 2000)}</pre>
+                    <div class="text-3xl">⚠️</div>
+                    <h3 class="text-base font-bold text-amber-400">cobalt এরর দিয়েছে</h3>
+                    <p class="text-xs text-gray-300 break-all">${escapeHtml(code)}</p>
+                    <p class="text-xs text-gray-500 mt-2">এই প্ল্যাটফর্ম/লিংক সাপোর্ট করছে না, অথবা instance-এ key লাগছে, অথবা ভিডিওটা প্রাইভেট/অনেক বড়।</p>
                 `;
                 return;
             }
 
-            const buttonsHtml = formats.map(f => `
-                <a href="${f.url}" target="_blank" rel="noopener" download
-                   class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
-                   ⬇️ ${f.label} ডাউনলোড করুন
-                </a>
-            `).join('');
+            if (data.status === 'redirect' || data.status === 'tunnel') {
+                resultContent.innerHTML = `
+                    <div class="text-3xl">✅</div>
+                    <h3 class="text-base font-bold text-emerald-400">ভিডিও পাওয়া গেছে!</h3>
+                    <p class="text-xs text-gray-400 break-all">সোর্স: ${escapeHtml(originalUrl)}</p>
+                    <a href="${data.url}" target="_blank" rel="noopener" download="${escapeHtml(data.filename || 'video')}"
+                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
+                       ⬇️ ${escapeHtml(data.filename || 'ডাউনলোড করুন')}
+                    </a>
+                `;
+                return;
+            }
+
+            if (data.status === 'picker' && Array.isArray(data.picker)) {
+                const items = data.picker.map((p, i) => `
+                    <a href="${p.url}" target="_blank" rel="noopener" download
+                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
+                       ⬇️ ${escapeHtml(p.type || ('আইটেম ' + (i + 1)))}
+                    </a>
+                `).join('');
+                const audio = data.audio ? `
+                    <a href="${data.audio}" target="_blank" rel="noopener" download
+                       class="quality-btn block w-full py-3 rounded-xl font-semibold text-white text-sm">
+                       🎵 অডিও ডাউনলোড করুন
+                    </a>` : '';
+                resultContent.innerHTML = `
+                    <div class="text-3xl">✅</div>
+                    <h3 class="text-base font-bold text-emerald-400">একাধিক আইটেম পাওয়া গেছে</h3>
+                    <div class="space-y-2 pt-2">${items}${audio}</div>
+                `;
+                return;
+            }
 
             resultContent.innerHTML = `
-                <div class="text-3xl">✅</div>
-                <h3 class="text-base font-bold text-emerald-400">ভিডিও পাওয়া গেছে!</h3>
-                <p class="text-xs text-gray-400 break-all">সোর্স: ${escapeHtml(originalUrl)}</p>
-                <div class="space-y-2 pt-2">${buttonsHtml}</div>
-                <p class="text-[10px] text-gray-500 pt-2">নোট: এই লিংকগুলো সরাসরি সোর্স সার্ভার থেকে আসে, তাই কোনো কোনো ব্রাউজারে ক্লিক করলে নতুন ট্যাবে ভিডিও চালু হতে পারে — সেখান থেকে ডান-ক্লিক করে "Save video as" করো।</p>
+                <div class="text-3xl">🤔</div>
+                <h3 class="text-base font-bold text-amber-400">অচেনা রেসপন্স</h3>
+                <pre class="text-left text-[10px] bg-black/50 rounded-lg p-3 overflow-auto max-h-48 mt-2">${escapeHtml(JSON.stringify(data, null, 2)).slice(0, 2000)}</pre>
             `;
         }
 
