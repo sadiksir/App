@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="bn" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Video Downloader | Sadik Tool's</title>
+    <title>Advanced Social Video Downloader | Sadik Tool's</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,35 +18,40 @@
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         #bg-glow-ball {
             position: fixed;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(147, 51, 234, 0.25) 50%, transparent 75%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 75%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: 1;
-            filter: blur(50px);
+            filter: blur(60px);
             left: -500px;
             top: -500px;
             transition: transform 0.05s ease-out;
         }
         .glass-card {
-            background: rgba(15, 23, 42, 0.78);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
-            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 20px 45px rgba(59, 130, 246, 0.25);
         }
         .platform-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
         .platform-btn:hover, .platform-btn.active {
-            background: rgba(59, 130, 246, 0.25);
+            background: rgba(59, 130, 246, 0.2);
             border-color: rgba(96, 165, 250, 0.6);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+            transform: translateY(-2px);
         }
         .btn-action {
             background: linear-gradient(135deg, #3b82f6, #6366f1);
@@ -54,18 +59,18 @@
         }
         .btn-action:hover {
             background: linear-gradient(135deg, #2563eb, #4f46e5);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
         }
-        .btn-action:active { transform: scale(0.96); }
+        .btn-action:active { transform: scale(0.97); }
         .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
         .custom-input {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
         .custom-input:focus {
             border-color: #60a5fa;
-            box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
             outline: none;
         }
     </style>
@@ -79,7 +84,7 @@
     <header class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center max-w-6xl mx-auto w-full relative z-10">
         <div class="flex items-center space-x-3">
             <span class="text-2xl animate-pulse">📥</span>
-            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader</h1>
+            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader Hub</h1>
         </div>
         <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition active:scale-95 border border-white/10">← Back Home</a>
     </header>
@@ -87,11 +92,11 @@
     <!-- Main Workspace -->
     <main class="max-w-xl mx-auto w-full mb-12 relative z-10 space-y-6">
 
-        <!-- Platform Selection Cards -->
+        <!-- Platform & Input Box -->
         <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 text-center">
-            <div class="text-3xl">🎬</div>
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Select Platform & Download</h2>
-            <p class="text-gray-400 text-xs md:text-sm">নিচে থেকে প্ল্যাটফর্ম সিলেক্ট করে ভিডিওর লিংক পেস্ট করুন।</p>
+            <div class="text-3xl">🚀</div>
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Universal Media Downloader</h2>
+            <p class="text-gray-400 text-xs md:text-sm">নিচে থেকে প্ল্যাটফর্ম সিলেক্ট করে আপনার ভিডিওর লিংক পেস্ট করুন।</p>
 
             <!-- Platform Buttons Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -115,8 +120,10 @@
 
             <!-- Input & Fetch Button -->
             <div class="space-y-3 pt-2">
-                <input type="url" id="video-url" placeholder="এখানে ভিডিওর লিংক দিন (https://...)" class="w-full custom-input rounded-xl px-4 py-3.5 text-white text-sm">
-                <button id="fetch-btn" onclick="fetchVideoWithApify()" class="btn-action w-full py-3.5 rounded-xl font-bold text-white shadow-lg text-sm">Fetch & Generate Download</button>
+                <input type="url" id="video-url" placeholder="YouTube লিংক দিন (https://youtube.com/...)" class="w-full custom-input rounded-xl px-4 py-3.5 text-white text-sm">
+                <button id="fetch-btn" onclick="fetchVideoWithApify()" class="btn-action w-full py-3.5 rounded-xl font-bold text-white shadow-lg text-sm flex items-center justify-center space-x-2">
+                    <span>⚡ Fetch & Generate Download</span>
+                </button>
             </div>
         </div>
 
@@ -130,7 +137,7 @@
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Powered by Apify API</p>
+        <p>© 2026 Sadik Tool's • Advanced High-Speed Engine</p>
     </footer>
 
     <script>
@@ -163,8 +170,8 @@
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
                 <div class="text-3xl animate-bounce">⏳</div>
-                <h3 class="text-base font-bold text-amber-400">Apify সার্ভার প্রসেস করছে...</h3>
-                <p class="text-xs text-gray-300">ভিডিওর ডেটা সংগ্রহ করতে ১০-১৫ সেকেন্ড সময় লাগতে পারে।</p>
+                <h3 class="text-base font-bold text-amber-400">এপিআই প্রসেসিং চলছে...</h3>
+                <p class="text-xs text-gray-300">ডেটা সংগ্রহ করতে ১০-১২ সেকেন্ড সময় লাগতে পারে।</p>
             `;
 
             const API_TOKEN = 'apify_api_5pMYXnDPwTtgqUKJ4gm8o95S78oOjf0SoxNg';
@@ -186,22 +193,21 @@
                     })
                 });
 
-                if (!response.ok) throw new Error('Apify API রিকোয়েস্ট ব্যর্থ হয়েছে।');
+                if (!response.ok) throw new Error('API Request Failed');
 
                 const items = await response.json();
                 
                 if (items && items.length > 0) {
-                    renderApifyResults(items[0], urlInput);
+                    renderAdvancedResults(items[0], urlInput);
                 } else {
-                    throw new Error('কোনো মিডিয়া ডেটা পাওয়া যায়নি।');
+                    throw new Error('No data found');
                 }
             } catch (err) {
                 console.error(err);
-                // Safe Fallback Redirect if API takes time or blocks
                 resultContent.innerHTML = `
                     <div class="text-3xl">🚀</div>
-                    <h3 class="text-base font-bold text-blue-400">ডাইরেক্ট ডাউনলোড হাব</h3>
-                    <p class="text-xs text-gray-300 mb-2">সার্ভার থেকে সরাসরি ফেচ করতে সমস্যা হলে নিচের লিংকে ক্লিক করুন:</p>
+                    <h3 class="text-base font-bold text-blue-400">ডাইরেক্ট হাই-স্পিড সার্ভার</h3>
+                    <p class="text-xs text-gray-300 mb-3">সার্ভার লিমিটের কারণে সরাসরি ফেচ না হলে নিচের ব্যাকআপ সার্ভার ব্যবহার করুন:</p>
                     <a href="https://en.savefrom.net/#url=${encodeURIComponent(urlInput)}" target="_blank" rel="noopener"
                        class="platform-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 shadow-lg">
                        📥 Open Fast Download Server
@@ -212,24 +218,68 @@
             }
         }
 
-        function renderApifyResults(item, originalUrl) {
+        function renderAdvancedResults(item, originalUrl) {
             const resultContent = document.getElementById('result-content');
             let downloadUrl = item.url || item.videoUrl || item.downloadUrl || originalUrl;
-            let title = item.title || "Social Media Video";
+            let title = item.title || "Social Media Video Content";
             let thumb = item.thumbnail || item.thumb || "";
 
-            let thumbHtml = thumb ? `<img src="${thumb}" class="w-full h-36 object-cover rounded-xl mb-3">` : '';
+            let thumbHtml = thumb ? `<img src="${thumb}" class="w-full h-40 object-cover rounded-xl mb-3 border border-white/10">` : '';
+
+            window.activeDownloadUrl = downloadUrl;
 
             resultContent.innerHTML = `
                 <div class="text-3xl">✅</div>
-                <h3 class="text-base font-bold text-emerald-400">ভিডিও সফলভাবে প্রস্তুত!</h3>
+                <h3 class="text-base font-bold text-emerald-400">ডাউনলোডের জন্য প্রস্তুত!</h3>
                 ${thumbHtml}
-                <p class="text-xs text-gray-300 font-medium line-clamp-2 px-1">${escapeHtml(title)}</p>
-                <a href="${downloadUrl}" target="_blank" rel="noopener" download
-                   class="platform-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg mt-2">
-                   ⬇️ Download Video File Now
-                </a>
+                <p class="text-xs text-gray-200 font-medium line-clamp-2 px-1 mb-2">${escapeHtml(title)}</p>
+                <div class="space-y-2">
+                    <button onclick="downloadMediaFile()"
+                       class="platform-btn w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg cursor-pointer">
+                       ⬇️ Download Video (Direct)
+                    </button>
+                    <a href="${downloadUrl}" target="_blank" rel="noopener"
+                       class="platform-btn block w-full py-2.5 rounded-xl font-semibold text-gray-300 text-xs bg-white/5 border border-white/10">
+                       🔗 Open Stream Link in New Tab
+                    </a>
+                </div>
             `;
+        }
+
+        async function downloadMediaFile() {
+            const fileUrl = window.activeDownloadUrl;
+            if (!fileUrl) return;
+
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "⏳ ডাউনলোড প্রসেস হচ্ছে...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(fileUrl);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = 'Sadik-Tools-Download.mp4';
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
+                btn.innerHTML = "✅ ডাউনলোড সফল!";
+            } catch (err) {
+                // Fallback direct window open if CORS blocks blob download
+                window.open(fileUrl, '_blank');
+                btn.innerHTML = "⬇️ Download Video (Direct)";
+            } finally {
+                setTimeout(() => { 
+                    btn.disabled = false; 
+                    btn.innerHTML = originalText;
+                }, 3000);
+            }
         }
 
         function escapeHtml(str) {
