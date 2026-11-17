@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Social Video Downloader | Sadik Tool's</title>
+    <title>Universal Video Downloader | Sadik Tool's</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,29 +18,25 @@
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         #bg-glow-ball {
             position: fixed;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 75%);
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 75%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: 1;
-            filter: blur(60px);
+            filter: blur(55px);
             left: -500px;
             top: -500px;
             transition: transform 0.05s ease-out;
         }
         .glass-card {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover {
-            border-color: rgba(96, 165, 250, 0.4);
-            box-shadow: 0 20px 45px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75);
+            transition: all 0.3s ease;
         }
         .platform-btn {
             background: rgba(255, 255, 255, 0.04);
@@ -48,30 +44,29 @@
             transition: all 0.25s ease;
         }
         .platform-btn:hover, .platform-btn.active {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(96, 165, 250, 0.6);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+            background: rgba(59, 130, 246, 0.22);
+            border-color: rgba(96, 165, 250, 0.65);
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.35);
             transform: translateY(-2px);
         }
-        .btn-action {
+        .btn-primary {
             background: linear-gradient(135deg, #3b82f6, #6366f1);
             transition: all 0.25s ease;
         }
-        .btn-action:hover {
+        .btn-primary:hover:not(:disabled) {
             background: linear-gradient(135deg, #2563eb, #4f46e5);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 22px rgba(59, 130, 246, 0.55);
         }
-        .btn-action:active { transform: scale(0.97); }
-        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-        .custom-input {
-            background: rgba(0, 0, 0, 0.6);
+        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+        .input-box {
+            background: rgba(2, 6, 23, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.15);
             transition: all 0.25s ease;
         }
-        .custom-input:focus {
+        .input-box:focus-within {
             border-color: #60a5fa;
-            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
-            outline: none;
+            box-shadow: 0 0 18px rgba(96, 165, 250, 0.25);
         }
     </style>
 </head>
@@ -81,101 +76,152 @@
     <div id="bg-glow-ball"></div>
 
     <!-- Header -->
-    <header class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center max-w-6xl mx-auto w-full relative z-10">
+    <header class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center max-w-5xl mx-auto w-full relative z-10">
         <div class="flex items-center space-x-3">
-            <span class="text-2xl animate-pulse">📥</span>
-            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader Hub</h1>
+            <span class="text-2xl">📥</span>
+            <h1 class="text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader</h1>
         </div>
-        <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition active:scale-95 border border-white/10">← Back Home</a>
+        <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm font-medium transition active:scale-95 border border-white/10">← Back Home</a>
     </header>
 
     <!-- Main Workspace -->
     <main class="max-w-xl mx-auto w-full mb-12 relative z-10 space-y-6">
 
-        <!-- Platform & Input Box -->
+        <!-- Main Card -->
         <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 text-center">
-            <div class="text-3xl">🚀</div>
-            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">Universal Media Downloader</h2>
-            <p class="text-gray-400 text-xs md:text-sm">নিচে থেকে প্ল্যাটফর্ম সিলেক্ট করে আপনার ভিডিওর লিংক পেস্ট করুন।</p>
+            <div>
+                <span class="inline-block px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-medium mb-2">Fast & No Watermark</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">Social Media Downloader</h2>
+                <p class="text-gray-400 text-xs md:text-sm mt-1">প্ল্যাটফর্ম সিলেক্ট করে ভিডিওর লিংক পেস্ট করুন</p>
+            </div>
 
-            <!-- Platform Buttons Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <button type="button" onclick="selectPlatform('youtube', this)" class="platform-btn active p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
-                    <span class="text-2xl">🔴</span>
-                    <span class="text-xs font-semibold text-white">YouTube</span>
+            <!-- Platform Tabs -->
+            <div class="grid grid-cols-4 gap-2.5">
+                <button type="button" onclick="setPlatform('youtube', this)" class="platform-btn active p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
+                    <span class="text-xl md:text-2xl">▶️</span>
+                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">YouTube</span>
                 </button>
-                <button type="button" onclick="selectPlatform('tiktok', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
-                    <span class="text-2xl">⚫</span>
-                    <span class="text-xs font-semibold text-white">TikTok</span>
+                <button type="button" onclick="setPlatform('tiktok', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
+                    <span class="text-xl md:text-2xl">🎵</span>
+                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">TikTok</span>
                 </button>
-                <button type="button" onclick="selectPlatform('instagram', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
-                    <span class="text-2xl">🟣</span>
-                    <span class="text-xs font-semibold text-white">Instagram</span>
+                <button type="button" onclick="setPlatform('instagram', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
+                    <span class="text-xl md:text-2xl">📸</span>
+                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">Instagram</span>
                 </button>
-                <button type="button" onclick="selectPlatform('facebook', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1.5 cursor-pointer">
-                    <span class="text-2xl">🔵</span>
-                    <span class="text-xs font-semibold text-white">Facebook</span>
+                <button type="button" onclick="setPlatform('facebook', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
+                    <span class="text-xl md:text-2xl">📘</span>
+                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">Facebook</span>
                 </button>
             </div>
 
-            <!-- Input & Fetch Button -->
-            <div class="space-y-3 pt-2">
-                <input type="url" id="video-url" placeholder="YouTube লিংক দিন (https://youtube.com/...)" class="w-full custom-input rounded-xl px-4 py-3.5 text-white text-sm">
-                <button id="fetch-btn" onclick="fetchVideoWithApify()" class="btn-action w-full py-3.5 rounded-xl font-bold text-white shadow-lg text-sm flex items-center justify-center space-x-2">
-                    <span>⚡ Fetch & Generate Download</span>
+            <!-- Input Group with Paste/Clear -->
+            <div class="space-y-3">
+                <div class="input-box flex items-center rounded-xl px-3 py-1.5">
+                    <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-transparent py-2.5 px-2 text-white text-sm focus:outline-none">
+                    <button type="button" id="paste-btn" onclick="handlePasteOrClear()" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-semibold text-blue-300 transition whitespace-nowrap">📋 Paste</button>
+                </div>
+
+                <button id="fetch-btn" onclick="startDownloadProcess()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-white shadow-lg text-sm flex items-center justify-center space-x-2 cursor-pointer">
+                    <span>⚡ Get Video & Audio</span>
                 </button>
             </div>
         </div>
 
-        <!-- Result Box -->
-        <div id="result-box" class="glass-card rounded-3xl p-6 hidden space-y-4 text-center">
-            <div id="result-content" class="space-y-3">
-                <!-- Dynamic Results -->
-            </div>
+        <!-- Status & Result Card -->
+        <div id="result-box" class="glass-card rounded-3xl p-6 hidden space-y-4">
+            <div id="result-content" class="text-center space-y-3"></div>
         </div>
 
     </main>
 
     <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • Advanced High-Speed Engine</p>
+        <p>© 2026 Sadik Tool's • High-Speed Media Engine</p>
     </footer>
 
     <script>
-        let selectedPlatform = 'youtube';
+        const API_TOKEN = 'apify_api_5pMYXnDPwTtgqUKJ4gm8o95S78oOjf0SoxNg';
+        const ACTOR_ID = 'wilcode~all-social-media-video-downloader';
 
-        function selectPlatform(platform, btnElement) {
-            selectedPlatform = platform;
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
+        const urlInput = document.getElementById('video-url');
+        const pasteBtn = document.getElementById('paste-btn');
+        const fetchBtn = document.getElementById('fetch-btn');
+        const resultBox = document.getElementById('result-box');
+        const resultContent = document.getElementById('result-content');
 
-            const inputField = document.getElementById('video-url');
-            if (platform === 'youtube') inputField.placeholder = "YouTube লিংক দিন (https://youtube.com/...)";
-            else if (platform === 'tiktok') inputField.placeholder = "TikTok লিংক দিন (https://tiktok.com/...)";
-            else if (platform === 'instagram') inputField.placeholder = "Instagram Reeling লিংক দিন...";
-            else if (platform === 'facebook') inputField.placeholder = "Facebook ভিডিও লিংক দিন...";
+        // Auto-detect platform when typing/pasting
+        urlInput.addEventListener('input', () => {
+            updatePasteButton();
+            const val = urlInput.value.toLowerCase();
+            const btns = document.querySelectorAll('.platform-btn');
+            if (val.includes('youtu')) setPlatform('youtube', btns[0], false);
+            else if (val.includes('tiktok')) setPlatform('tiktok', btns[1], false);
+            else if (val.includes('instagram')) setPlatform('instagram', btns[2], false);
+            else if (val.includes('facebook') || val.includes('fb.watch')) setPlatform('facebook', btns[3], false);
+        });
+
+        function updatePasteButton() {
+            if (urlInput.value.trim().length > 0) {
+                pasteBtn.innerHTML = '✖ Clear';
+                pasteBtn.classList.replace('text-blue-300', 'text-red-300');
+            } else {
+                pasteBtn.innerHTML = '📋 Paste';
+                pasteBtn.classList.replace('text-red-300', 'text-blue-300');
+            }
         }
 
-        async function fetchVideoWithApify() {
-            const urlInput = document.getElementById('video-url').value.trim();
-            const resultBox = document.getElementById('result-box');
-            const resultContent = document.getElementById('result-content');
-            const fetchBtn = document.getElementById('fetch-btn');
+        async function handlePasteOrClear() {
+            if (urlInput.value.trim().length > 0) {
+                urlInput.value = '';
+                resultBox.classList.add('hidden');
+                updatePasteButton();
+                urlInput.focus();
+            } else {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    urlInput.value = text;
+                    urlInput.dispatchEvent(new Event('input'));
+                } catch (err) {
+                    alert('ব্রাউজার থেকে অটো-পেস্ট ব্লক করা আছে, দয়া করে ম্যানুয়ালি পেস্ট করুন।');
+                }
+            }
+        }
 
-            if (!urlInput) {
-                alert('দয়া করে প্রথমে একটি ভিডিওর লিংক দিন!');
+        function setPlatform(platform, btn, clearInput = false) {
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const placeholders = {
+                youtube: 'https://www.youtube.com/watch?v=...',
+                tiktok: 'https://www.tiktok.com/@user/video/...',
+                instagram: 'https://www.instagram.com/reel/...',
+                facebook: 'https://www.facebook.com/watch/?v=...'
+            };
+            urlInput.placeholder = placeholders[platform] || 'ভিডিওর লিংক পেস্ট করুন...';
+            if (clearInput) {
+                urlInput.value = '';
+                updatePasteButton();
+            }
+        }
+
+        async function startDownloadProcess() {
+            const link = urlInput.value.trim();
+            if (!link || !link.startsWith('http')) {
+                alert('দয়া করে একটি সঠিক ভিডিওর লিংক দিন!');
                 return;
             }
 
             fetchBtn.disabled = true;
+            fetchBtn.innerHTML = `<span class="animate-spin">⏳</span> <span>Processing...</span>`;
             resultBox.classList.remove('hidden');
             resultContent.innerHTML = `
-                <div class="text-3xl animate-bounce">⏳</div>
-                <h3 class="text-base font-bold text-amber-400">এপিআই প্রসেসিং চলছে...</h3>
-                <p class="text-xs text-gray-300">ডেটা সংগ্রহ করতে ১০-১২ সেকেন্ড সময় লাগতে পারে।</p>
+                <div class="py-4 space-y-2">
+                    <div class="text-4xl animate-bounce">⚙️</div>
+                    <h3 class="text-base font-bold text-blue-300">ভিডিও ফাইল খোঁজা হচ্ছে...</h3>
+                    <p class="text-xs text-gray-400">Apify ক্লাউড সার্ভার থেকে ডাউনলোড লিংক তৈরি হচ্ছে (১০-১৫ সেকেন্ড সময় লাগতে পারে)</p>
+                </div>
             `;
 
-            const API_TOKEN = 'apify_api_5pMYXnDPwTtgqUKJ4gm8o95S78oOjf0SoxNg';
-            const ACTOR_ID = 'wilcode~all-social-media-video-downloader';
             const endpoint = `https://api.apify.com/v2/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`;
 
             try {
@@ -183,101 +229,161 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        url: urlInput,
+                        url: link,
                         proxySettings: {
                             useApifyProxy: true,
                             apifyProxyGroups: ["RESIDENTIAL"],
                             apifyProxyCountry: "CA"
                         },
-                        mergeAV: false
+                        mergeAV: true
                     })
                 });
 
-                if (!response.ok) throw new Error('API Request Failed');
+                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
 
-                const items = await response.json();
-                
-                if (items && items.length > 0) {
-                    renderAdvancedResults(items[0], urlInput);
-                } else {
-                    throw new Error('No data found');
-                }
-            } catch (err) {
-                console.error(err);
+                const data = await response.json();
+                if (!data || data.length === 0) throw new Error('No media found');
+
+                parseAndDisplayMedia(data[0], link);
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
                 resultContent.innerHTML = `
-                    <div class="text-3xl">🚀</div>
-                    <h3 class="text-base font-bold text-blue-400">ডাইরেক্ট হাই-স্পিড সার্ভার</h3>
-                    <p class="text-xs text-gray-300 mb-3">সার্ভার লিমিটের কারণে সরাসরি ফেচ না হলে নিচের ব্যাকআপ সার্ভার ব্যবহার করুন:</p>
-                    <a href="https://en.savefrom.net/#url=${encodeURIComponent(urlInput)}" target="_blank" rel="noopener"
-                       class="platform-btn block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 shadow-lg">
-                       📥 Open Fast Download Server
-                    </a>
+                    <div class="p-2 space-y-3">
+                        <div class="text-3xl">⚠️</div>
+                        <h3 class="text-base font-bold text-amber-400">সরাসরি ফেচ করা সম্ভব হয়নি</h3>
+                        <p class="text-xs text-gray-300">ভিডিওটি প্রাইভেট হতে পারে অথবা সার্ভার ব্যস্ত আছে। নিচের বিকল্প সার্ভার থেকে ডাউনলোড করুন:</p>
+                        <a href="https://en.savefrom.net/#url=${encodeURIComponent(link)}" target="_blank" rel="noopener"
+                           class="block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
+                           🚀 Download via Backup Server
+                        </a>
+                    </div>
                 `;
             } finally {
                 fetchBtn.disabled = false;
+                fetchBtn.innerHTML = `<span>⚡ Get Video & Audio</span>`;
             }
         }
 
-        function renderAdvancedResults(item, originalUrl) {
-            const resultContent = document.getElementById('result-content');
-            let downloadUrl = item.url || item.videoUrl || item.downloadUrl || originalUrl;
-            let title = item.title || "Social Media Video Content";
-            let thumb = item.thumbnail || item.thumb || "";
+        function parseAndDisplayMedia(item, originalUrl) {
+            const title = item.title || item.description || 'Social Media Video';
+            const thumb = item.thumbnail || item.thumb || item.picture || '';
+            let downloadOptions = [];
 
-            let thumbHtml = thumb ? `<img src="${thumb}" class="w-full h-40 object-cover rounded-xl mb-3 border border-white/10">` : '';
+            // Extract formats/medias array if provided by Apify actor
+            if (Array.isArray(item.medias) && item.medias.length > 0) {
+                item.medias.forEach(m => {
+                    if (m.url) {
+                        downloadOptions.push({
+                            label: `${m.quality || m.extension || 'Video'} (${m.extension ? m.extension.toUpperCase() : 'MP4'})`,
+                            url: m.url,
+                            ext: m.extension || 'mp4',
+                            isAudio: m.audioAvailable && !m.videoAvailable
+                        });
+                    }
+                });
+            } else if (Array.isArray(item.formats) && item.formats.length > 0) {
+                item.formats.forEach(f => {
+                    if (f.url) {
+                        downloadOptions.push({
+                            label: `${f.format || f.quality || 'Download'} (${f.ext || 'mp4'})`,
+                            url: f.url,
+                            ext: f.ext || 'mp4',
+                            isAudio: false
+                        });
+                    }
+                });
+            }
 
-            window.activeDownloadUrl = downloadUrl;
+            // Fallback to single direct URL properties
+            if (downloadOptions.length === 0) {
+                const directUrl = item.url || item.videoUrl || item.downloadUrl || item.hd || item.sd;
+                if (directUrl) {
+                    downloadOptions.push({
+                        label: 'Download HD Video (MP4)',
+                        url: directUrl,
+                        ext: 'mp4',
+                        isAudio: false
+                    });
+                }
+            }
+
+            if (downloadOptions.length === 0) {
+                throw new Error('No valid download URLs in response');
+            }
+
+            const thumbHtml = thumb 
+                ? `<img src="${escapeHtml(thumb)}" alt="Thumbnail" class="w-full h-44 object-cover rounded-2xl border border-white/10 shadow-md">` 
+                : '';
+
+            const buttonsHtml = downloadOptions.slice(0, 5).map((opt, idx) => {
+                const safeFilename = `Sadik-Tools-${Date.now()}.${opt.ext}`;
+                const btnColor = opt.isAudio 
+                    ? 'from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500' 
+                    : 'from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500';
+                const icon = opt.isAudio ? '🎵' : '⬇️';
+
+                return `
+                    <button type="button" onclick="forceDirectDownload(this, '${escapeAttr(opt.url)}', '${safeFilename}')"
+                        class="w-full py-3.5 px-4 rounded-xl font-bold text-white text-sm bg-gradient-to-r ${btnColor} shadow-lg transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+                        <span>${icon}</span>
+                        <span>${escapeHtml(opt.label)}</span>
+                    </button>
+                `;
+            }).join('');
 
             resultContent.innerHTML = `
-                <div class="text-3xl">✅</div>
-                <h3 class="text-base font-bold text-emerald-400">ডাউনলোডের জন্য প্রস্তুত!</h3>
-                ${thumbHtml}
-                <p class="text-xs text-gray-200 font-medium line-clamp-2 px-1 mb-2">${escapeHtml(title)}</p>
-                <div class="space-y-2">
-                    <button onclick="downloadMediaFile()"
-                       class="platform-btn w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg cursor-pointer">
-                       ⬇️ Download Video (Direct)
-                    </button>
-                    <a href="${downloadUrl}" target="_blank" rel="noopener"
-                       class="platform-btn block w-full py-2.5 rounded-xl font-semibold text-gray-300 text-xs bg-white/5 border border-white/10">
-                       🔗 Open Stream Link in New Tab
-                    </a>
+                <div class="space-y-4 text-left">
+                    ${thumbHtml}
+                    <div>
+                        <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">● Ready to Download</span>
+                        <h3 class="text-sm md:text-base font-semibold text-white line-clamp-2 mt-0.5">${escapeHtml(title)}</h3>
+                    </div>
+                    <div class="space-y-2.5 pt-1">
+                        ${buttonsHtml}
+                    </div>
+                    <p class="text-[11px] text-gray-400 text-center pt-1">ডাউনলোড শুরু না হলে বাটনে চেপে ধরে "Download Link" সিলেক্ট করুন।</p>
                 </div>
             `;
         }
 
-        async function downloadMediaFile() {
-            const fileUrl = window.activeDownloadUrl;
-            if (!fileUrl) return;
-
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "⏳ ডাউনলোড প্রসেস হচ্ছে...";
-            btn.disabled = true;
+        // Smart Blob Downloader to force file save instead of tab redirect
+        async function forceDirectDownload(btnElement, fileUrl, filename) {
+            const originalHtml = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<span class="animate-spin">⏳</span> <span>Downloading File...</span>`;
 
             try {
-                const response = await fetch(fileUrl);
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
+                const res = await fetch(fileUrl);
+                if (!res.ok) throw new Error('Network blocked');
+                
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
                 
                 const a = document.createElement('a');
-                a.style.display = 'none';
                 a.href = blobUrl;
-                a.download = 'Sadik-Tools-Download.mp4';
+                a.download = filename;
                 document.body.appendChild(a);
                 a.click();
-                
-                window.URL.revokeObjectURL(blobUrl);
                 document.body.removeChild(a);
-                btn.innerHTML = "✅ ডাউনলোড সফল!";
+                
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+                btnElement.innerHTML = `<span>✅</span> <span>Saved to Device!</span>`;
             } catch (err) {
-                // Fallback direct window open if CORS blocks blob download
-                window.open(fileUrl, '_blank');
-                btn.innerHTML = "⬇️ Download Video (Direct)";
+                // If CDN strictly blocks XHR/Fetch via CORS, trigger native browser download anchor
+                const a = document.createElement('a');
+                a.href = fileUrl;
+                a.setAttribute('download', filename);
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                btnElement.innerHTML = `<span>↗️</span> <span>Opened Direct Stream</span>`;
             } finally {
-                setTimeout(() => { 
-                    btn.disabled = false; 
-                    btn.innerHTML = originalText;
+                setTimeout(() => {
+                    btnElement.disabled = false;
+                    btnElement.innerHTML = originalHtml;
                 }, 3000);
             }
         }
@@ -286,7 +392,11 @@
             return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
-        // Background Particle & Glow Animation Script
+        function escapeAttr(str) {
+            return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // Interactive Background Canvas
         const glowBall = document.getElementById('bg-glow-ball');
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
@@ -309,57 +419,7 @@
             }
         }
 
-        window.addEventListener('mousemove', (e) => { updatePointer(e.clientX, e.clientY); });
-        window.addEventListener('touchmove', (e) => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
-        window.addEventListener('touchstart', (e) => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+        window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
+        window.addEventListener('touchmove', e => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
 
-        const particles = [];
-        for (let i = 0; i < 150; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 2.5 + 0.8,
-                vx: (Math.random() - 0.5) * 0.8,
-                vy: (Math.random() - 0.5) * 0.8,
-                color: Math.random() > 0.4 ? 'rgba(96, 165, 250, 0.7)' : 'rgba(167, 139, 250, 0.7)'
-            });
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-                let dx = pointer.x - p.x;
-                let dy = pointer.y - p.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < pointer.radius) {
-                    let cacheForce = (pointer.radius - distance) / pointer.radius;
-                    p.x += (dx / distance) * cacheForce * 3.5;
-                    p.y += (dy / distance) * cacheForce * 3.5;
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(96, 165, 250, ${cacheForce * 0.35})`;
-                    ctx.lineWidth = 0.8;
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(pointer.x, pointer.y);
-                    ctx.stroke();
-                }
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = '#60a5fa';
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-            requestAnimationFrame(animate);
-        }
-        animate();
-    </script>
-</body>
-</html>
+        
