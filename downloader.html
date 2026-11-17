@@ -1,425 +1,447 @@
 <!DOCTYPE html>
-<html lang="bn" class="dark">
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Video Downloader | Sadik Tool's</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #02040a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        #bg-glow-ball {
-            position: fixed;
-            width: 380px;
-            height: 380px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 75%);
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            filter: blur(55px);
-            left: -500px;
-            top: -500px;
-            transition: transform 0.05s ease-out;
-        }
-        .glass-card {
-            background: rgba(15, 23, 42, 0.72);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75);
-            transition: all 0.3s ease;
-        }
-        .platform-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.25s ease;
-        }
-        .platform-btn:hover, .platform-btn.active {
-            background: rgba(59, 130, 246, 0.22);
-            border-color: rgba(96, 165, 250, 0.65);
-            box-shadow: 0 0 18px rgba(59, 130, 246, 0.35);
-            transform: translateY(-2px);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
-            transition: all 0.25s ease;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
-            box-shadow: 0 0 22px rgba(59, 130, 246, 0.55);
-        }
-        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
-        .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
-        .input-box {
-            background: rgba(2, 6, 23, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.25s ease;
-        }
-        .input-box:focus-within {
-            border-color: #60a5fa;
-            box-shadow: 0 0 18px rgba(96, 165, 250, 0.25);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Video Downloader | Sadik Tool's</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap">
+<style>
+/* ===== Design tokens =====
+   Deep teal-emerald glass field (matches the Shobkhane Hub palette), one
+   accent for action, one warm accent for highlights/badges. Layout: a
+   centered glass "workbench" — settings drawer, fetch bar, animated result
+   panel — floating over an ambient aurora + particle backdrop. */
+:root{
+  --bg-0:#0a1f1a; --bg-1:#0e2b23; --bg-2:#123a2f;
+  --glass: rgba(255,255,255,0.06);
+  --glass-strong: rgba(255,255,255,0.11);
+  --border: rgba(255,255,255,0.13);
+  --text-hi:#eef7f2; --text-lo:#9fbdb2; --text-faint:#6f8c82;
+  --accent:#00d793; --accent-ink:#06241c;
+  --accent-2:#ffb020;
+  --danger:#ff6b6b; --danger-ink:#3a0f0f;
+  --focus:#7fe9c9;
+  color-scheme: dark;
+}
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 650px at 15% -10%, #163e32 0%, transparent 60%),
+    radial-gradient(950px 600px at 105% 8%, #0f4536 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+  color: var(--text-hi);
+  font-family: Inter, "Noto Sans Bengali", system-ui, sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+  padding-left: max(16px, env(safe-area-inset-left,0px));
+  padding-right: max(16px, env(safe-area-inset-right,0px));
+}
+.bn{ font-family:"Noto Sans Bengali", Inter, system-ui, sans-serif; }
+h1,h2,h3,.disp{ font-family:"Space Grotesk","Noto Sans Bengali",system-ui,sans-serif; letter-spacing:-0.01em; }
+::selection{ background: var(--accent); color: var(--accent-ink); }
+
+#bg-canvas{ position:fixed; inset:0; z-index:0; }
+#bg-glow{
+  position:fixed; width:420px; height:420px; left:-600px; top:-600px;
+  background: radial-gradient(circle, rgba(0,215,147,.32) 0%, rgba(0,160,120,.14) 48%, transparent 72%);
+  border-radius:50%; filter: blur(50px); pointer-events:none; z-index:1;
+  transform: translate(-50%,-50%); transition: left .06s linear, top .06s linear;
+}
+
+.wrap{ max-width: 620px; margin: 0 auto; padding-block: 24px 60px; position:relative; z-index:2; }
+
+.glass{
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 16px 44px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* ---------- topbar ---------- */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 16px; margin-bottom:22px;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:16px; }
+.brand .mark{
+  width:32px;height:32px;border-radius:10px; display:grid; place-items:center; flex:none;
+  background: linear-gradient(145deg, var(--accent), #079466); color:var(--accent-ink);
+  font-size:16px; box-shadow:0 6px 16px -4px rgba(0,215,147,.55);
+}
+.home-link{
+  display:flex; align-items:center; gap:6px; padding:9px 15px; border-radius:12px;
+  border:1px solid var(--border); background: var(--glass); color:var(--text-hi);
+  text-decoration:none; font-size:13px; font-weight:600;
+}
+.home-link:hover{ border-color: rgba(0,215,147,.4); }
+
+/* ---------- ripple highlight for every clickable control ---------- */
+.tap{ position:relative; overflow:hidden; isolation:isolate; }
+.tap::after{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,.5), transparent 46%);
+  opacity:0; pointer-events:none; z-index:2;
+}
+.tap.hit::after{ opacity:1; transition:none; }
+.tap.fading::after{ transition: opacity .5s ease; opacity:0; }
+
+/* ---------- hero ---------- */
+.hero{ text-align:center; padding: 30px 26px 26px; margin-bottom:18px; }
+.hero .glyph{ font-size:38px; margin-bottom:10px; }
+.hero h1{ font-size: clamp(22px,5vw,28px); margin:0 0 8px; }
+.hero p{ margin:0; color:var(--text-lo); font-size:13.5px; }
+
+/* ---------- settings drawer ---------- */
+.settings{ padding:16px 18px; margin-bottom:16px; }
+.settings-head{
+  width:100%; display:flex; justify-content:space-between; align-items:center;
+  background:none; border:none; color:var(--text-lo); font-size:12.5px; font-weight:700;
+  cursor:pointer; padding:2px 0;
+}
+.settings-head .caret{ transition: transform .2s ease; color: var(--accent); }
+.settings-head.open .caret{ transform: rotate(180deg); }
+.settings-body{ display:flex; flex-direction:column; gap:12px; padding-top:14px; }
+.settings-body[hidden]{ display:none; }
+.field label{ display:block; font-size:11px; font-weight:600; color: var(--text-faint); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+.hint{ font-size:11px; color: var(--text-faint); line-height:1.6; }
+.hint a{ color: var(--accent); text-decoration: underline; text-underline-offset:2px; }
+
+/* ---------- inputs ---------- */
+input[type=url], input[type=text]{
+  width:100%; padding:12px 14px; border-radius:13px; border:1px solid var(--border);
+  background: rgba(0,0,0,.22); color:var(--text-hi); font-size:13.5px; font-family: inherit;
+}
+input::placeholder{ color: var(--text-faint); }
+input:focus{ outline:2px solid var(--focus); outline-offset:1px; border-color: transparent; }
+
+/* ---------- quality chips ---------- */
+.qgroup{ display:flex; flex-wrap:wrap; gap:8px; }
+.qchip{
+  padding:8px 14px; border-radius:999px; font-size:12.5px; font-weight:700;
+  border:1px solid var(--border); background: rgba(0,0,0,.2); color:var(--text-lo); cursor:pointer;
+  font-variant-numeric: tabular-nums;
+}
+.qchip.sel{ background: linear-gradient(135deg, var(--accent), #04b67f); color: var(--accent-ink); border-color: transparent; }
+
+/* ---------- main action card ---------- */
+.action{ padding: 26px 24px; text-align:center; }
+.action .glyph{ font-size:40px; margin-bottom:8px; }
+.action h2{ font-size:20px; margin:0 0 4px; }
+.action .sub{ color:var(--text-lo); font-size:13px; margin:0 0 20px; }
+
+.urlrow{ display:flex; flex-direction:column; gap:12px; margin-bottom:6px; }
+@media(min-width:480px){ .urlrow{ flex-direction:row; } }
+.urlrow input{ flex:1; min-width:0; }
+
+.btn{
+  border:none; border-radius:13px; font-weight:700; font-size:14px; cursor:pointer;
+  padding:12.5px 22px; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  background: linear-gradient(135deg, var(--accent), #04b67f); color: var(--accent-ink);
+  box-shadow: 0 10px 26px -12px rgba(0,215,147,.65);
+  white-space:nowrap;
+}
+.btn:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; }
+.btn.ghost{
+  background: var(--glass-strong); color:var(--text-hi); border:1px solid var(--border);
+  box-shadow:none; font-size:12.5px; padding:10px 16px;
+}
+
+/* ---------- result ---------- */
+.result{ margin-top:18px; padding:22px; text-align:center; }
+.result[hidden]{ display:none; }
+.result .glyph{ font-size:32px; margin-bottom:8px; }
+.result h3{ font-size:16px; margin:0 0 6px; }
+.result .meta{ color:var(--text-faint); font-size:11.5px; word-break:break-all; margin-bottom:14px; }
+.result .msg{ color:var(--text-lo); font-size:12.5px; line-height:1.6; margin-top:10px; }
+
+.spinner{
+  width:34px;height:34px;border-radius:50%; margin:0 auto 10px;
+  border:3px solid rgba(255,255,255,.12); border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+.dlbtn{
+  display:flex; align-items:center; justify-content:center; gap:10px; width:100%;
+  padding:14px 16px; border-radius:14px; font-weight:700; font-size:13.5px;
+  background: rgba(0,215,147,.1); border:1px solid rgba(0,215,147,.35); color: var(--text-hi);
+  text-decoration:none; margin-bottom:10px;
+}
+.dlbtn:hover{ background: rgba(0,215,147,.18); }
+.dlbtn:last-child{ margin-bottom:0; }
+
+.note{
+  display:flex; gap:9px; text-align:left; padding:12px 14px; border-radius:14px; font-size:12px; line-height:1.6;
+  background: rgba(255,176,32,.08); border:1px solid rgba(255,176,32,.25); color:#ffd690; margin-top:14px;
+}
+.rawbox{
+  text-align:left; font-size:10.5px; background: rgba(0,0,0,.35); border-radius:12px; padding:12px;
+  overflow:auto; max-height:200px; color: var(--text-lo); margin-top:10px; font-family: ui-monospace, monospace;
+}
+
+.platform-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.pchip{
+  font-size:11px; font-weight:700; padding:6px 12px; border-radius:999px;
+  border:1px solid var(--border); color: var(--text-faint); background: rgba(0,0,0,.18);
+}
+
+footer{ text-align:center; color: var(--text-faint); font-size:11.5px; margin-top:28px; }
+footer a{ color: var(--text-lo); }
+
+@media (max-width:480px){ .action{ padding:20px 18px; } .hero{ padding:24px 18px; } }
+@media (prefers-reduced-motion: reduce){ .spinner{ animation:none; } .tap.fading::after{ transition:none; opacity:0; } }
+</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+<body>
 
-    <canvas id="bg-canvas"></canvas>
-    <div id="bg-glow-ball"></div>
+<canvas id="bg-canvas"></canvas>
+<div id="bg-glow"></div>
 
-    <!-- Header -->
-    <header class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center max-w-5xl mx-auto w-full relative z-10">
-        <div class="flex items-center space-x-3">
-            <span class="text-2xl">📥</span>
-            <h1 class="text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Sadik Video Downloader</h1>
-        </div>
-        <a href="index.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs md:text-sm font-medium transition active:scale-95 border border-white/10">← Back Home</a>
-    </header>
+<div class="wrap">
 
-    <!-- Main Workspace -->
-    <main class="max-w-xl mx-auto w-full mb-12 relative z-10 space-y-6">
+  <div class="topbar">
+    <div class="brand"><span class="mark">📥</span> Sadik Video Downloader</div>
+    <a href="index.html" class="home-link tap">← হোমে ফিরুন</a>
+  </div>
 
-        <!-- Main Card -->
-        <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 text-center">
-            <div>
-                <span class="inline-block px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-medium mb-2">Fast & No Watermark</span>
-                <h2 class="text-2xl md:text-3xl font-bold text-white">Social Media Downloader</h2>
-                <p class="text-gray-400 text-xs md:text-sm mt-1">প্ল্যাটফর্ম সিলেক্ট করে ভিডিওর লিংক পেস্ট করুন</p>
-            </div>
+  <div class="glass hero">
+    <div class="glyph">🎬</div>
+    <h1 class="bn">লিংক দাও, ভিডিও নাও</h1>
+    <p class="bn">ইউটিউব, টিকটক, ইনস্টাগ্রাম বা ফেসবুক — যেকোনো লিংক পেস্ট করলেই ডাউনলোডযোগ্য ফাইল রেডি হবে।</p>
+    <div class="platform-row">
+      <span class="pchip">YouTube</span>
+      <span class="pchip">TikTok</span>
+      <span class="pchip">Instagram</span>
+      <span class="pchip">Facebook</span>
+    </div>
+  </div>
 
-            <!-- Platform Tabs -->
-            <div class="grid grid-cols-4 gap-2.5">
-                <button type="button" onclick="setPlatform('youtube', this)" class="platform-btn active p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
-                    <span class="text-xl md:text-2xl">▶️</span>
-                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">YouTube</span>
-                </button>
-                <button type="button" onclick="setPlatform('tiktok', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
-                    <span class="text-xl md:text-2xl">🎵</span>
-                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">TikTok</span>
-                </button>
-                <button type="button" onclick="setPlatform('instagram', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
-                    <span class="text-xl md:text-2xl">📸</span>
-                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">Instagram</span>
-                </button>
-                <button type="button" onclick="setPlatform('facebook', this)" class="platform-btn p-3 rounded-2xl flex flex-col items-center space-y-1 cursor-pointer">
-                    <span class="text-xl md:text-2xl">📘</span>
-                    <span class="text-[11px] md:text-xs font-semibold text-gray-200">Facebook</span>
-                </button>
-            </div>
+  <div class="glass settings">
+    <button type="button" class="settings-head tap" id="settingsToggle">
+      <span class="bn">⚙️ cobalt ইনস্ট্যান্স সেটিংস</span>
+      <span class="caret">▾</span>
+    </button>
+    <div class="settings-body" id="settingsBody">
+      <div class="field">
+        <label>Cobalt instance API URL</label>
+        <input type="url" id="instanceUrl" placeholder="https://api.your-instance.example.com">
+      </div>
+      <div class="field">
+        <label class="bn">API Key (লাগলে বসাও, না লাগলে খালি রাখো)</label>
+        <input type="text" id="instanceKey" placeholder="Api-Key xxxxxxxx">
+      </div>
+      <p class="hint bn">নিজের ফ্রি instance চালাতে <a href="https://github.com/wukko/cobalt" target="_blank" rel="noopener">github.com/wukko/cobalt</a> দেখো, অথবা টেস্টের জন্য <a href="https://instances.cobalt.best" target="_blank" rel="noopener">instances.cobalt.best</a> থেকে <b>API URL</b> (frontend URL না) কপি করে বসাও।</p>
+      <button type="button" class="btn ghost tap" id="saveSettingsBtn">সেভ করো</button>
+    </div>
+  </div>
 
-            <!-- Input Group with Paste/Clear -->
-            <div class="space-y-3">
-                <div class="input-box flex items-center rounded-xl px-3 py-1.5">
-                    <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-transparent py-2.5 px-2 text-white text-sm focus:outline-none">
-                    <button type="button" id="paste-btn" onclick="handlePasteOrClear()" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-semibold text-blue-300 transition whitespace-nowrap">📋 Paste</button>
-                </div>
+  <div class="glass action">
+    <div class="glyph">⬇️</div>
+    <h2 class="bn">ভিডিও ফেচ করুন</h2>
+    <p class="sub bn">কোয়ালিটি বেছে নিয়ে লিংক পেস্ট করো।</p>
 
-                <button id="fetch-btn" onclick="startDownloadProcess()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-white shadow-lg text-sm flex items-center justify-center space-x-2 cursor-pointer">
-                    <span>⚡ Get Video & Audio</span>
-                </button>
-            </div>
-        </div>
+    <div class="qgroup" id="qualityGroup" style="justify-content:center;margin-bottom:18px">
+      <button class="qchip tap" data-q="2160">4K</button>
+      <button class="qchip tap" data-q="1440">1440p</button>
+      <button class="qchip sel tap" data-q="1080">1080p</button>
+      <button class="qchip tap" data-q="720">720p</button>
+      <button class="qchip tap" data-q="480">480p</button>
+      <button class="qchip tap" data-q="360">360p</button>
+    </div>
 
-        <!-- Status & Result Card -->
-        <div id="result-box" class="glass-card rounded-3xl p-6 hidden space-y-4">
-            <div id="result-content" class="text-center space-y-3"></div>
-        </div>
+    <div class="urlrow">
+      <input type="url" id="videoUrl" placeholder="ভিডিওর লিংক পেস্ট করুন (https://...)">
+      <button class="btn tap" id="fetchBtn">Fetch Video</button>
+    </div>
+  </div>
 
-    </main>
+  <div class="glass result" id="resultBox" hidden>
+    <div id="resultContent"></div>
+  </div>
 
-    <footer class="text-center text-gray-500 text-xs py-4 relative z-10">
-        <p>© 2026 Sadik Tool's • High-Speed Media Engine</p>
-    </footer>
+  <footer>© 2026 Sadik Tool's • চলে <a href="https://github.com/wukko/cobalt" target="_blank" rel="noopener">cobalt</a>-এর মাধ্যমে</footer>
+</div>
 
-    <script>
-        const API_TOKEN = 'apify_api_5pMYXnDPwTtgqUKJ4gm8o95S78oOjf0SoxNg';
-        const ACTOR_ID = 'wilcode~all-social-media-video-downloader';
+<script>
+(function(){
+"use strict";
 
-        const urlInput = document.getElementById('video-url');
-        const pasteBtn = document.getElementById('paste-btn');
-        const fetchBtn = document.getElementById('fetch-btn');
-        const resultBox = document.getElementById('result-box');
-        const resultContent = document.getElementById('result-content');
+/* ---------- ripple highlight ---------- */
+document.body.addEventListener("click", function(e){
+  var el = e.target.closest(".tap");
+  if(!el) return;
+  var r = el.getBoundingClientRect();
+  el.style.setProperty("--rx", ((e.clientX - r.left) / r.width * 100) + "%");
+  el.style.setProperty("--ry", ((e.clientY - r.top) / r.height * 100) + "%");
+  el.classList.remove("fading"); el.classList.remove("hit");
+  void el.offsetWidth;
+  el.classList.add("hit");
+  requestAnimationFrame(function(){
+    el.classList.remove("hit"); el.classList.add("fading");
+    setTimeout(function(){ el.classList.remove("fading"); }, 520);
+  });
+}, true);
 
-        // Auto-detect platform when typing/pasting
-        urlInput.addEventListener('input', () => {
-            updatePasteButton();
-            const val = urlInput.value.toLowerCase();
-            const btns = document.querySelectorAll('.platform-btn');
-            if (val.includes('youtu')) setPlatform('youtube', btns[0], false);
-            else if (val.includes('tiktok')) setPlatform('tiktok', btns[1], false);
-            else if (val.includes('instagram')) setPlatform('instagram', btns[2], false);
-            else if (val.includes('facebook') || val.includes('fb.watch')) setPlatform('facebook', btns[3], false);
-        });
+/* ---------- ambient particle backdrop ---------- */
+var glow = document.getElementById("bg-glow");
+var canvas = document.getElementById("bg-canvas");
+var ctx = canvas.getContext("2d");
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+resize(); addEventListener("resize", resize);
+var pointer = { x: innerWidth/2, y: innerHeight/2, r: 190 };
+function move(x,y){ pointer.x=x; pointer.y=y; if(glow){ glow.style.left=x+"px"; glow.style.top=y+"px"; } }
+addEventListener("mousemove", function(e){ move(e.clientX, e.clientY); });
+addEventListener("touchmove", function(e){ if(e.touches[0]) move(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+var particles = [];
+for(var i=0;i<110;i++){
+  particles.push({
+    x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+    r: Math.random()*2.4+0.8, vx:(Math.random()-0.5)*0.6, vy:(Math.random()-0.5)*0.6,
+    c: Math.random()>0.5 ? "rgba(0,215,147,0.75)" : "rgba(127,233,201,0.7)"
+  });
+}
+function tick(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(function(p){
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1;
+    if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    var dx=pointer.x-p.x, dy=pointer.y-p.y, d=Math.sqrt(dx*dx+dy*dy);
+    if(d<pointer.r){
+      var f=(pointer.r-d)/pointer.r;
+      p.x += (dx/d)*f*3; p.y += (dy/d)*f*3;
+      ctx.beginPath(); ctx.strokeStyle="rgba(0,215,147,"+(f*0.35)+")"; ctx.lineWidth=0.8;
+      ctx.moveTo(p.x,p.y); ctx.lineTo(pointer.x,pointer.y); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=p.c; ctx.fill();
+  });
+  requestAnimationFrame(tick);
+}
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches) tick();
 
-        function updatePasteButton() {
-            if (urlInput.value.trim().length > 0) {
-                pasteBtn.innerHTML = '✖ Clear';
-                pasteBtn.classList.replace('text-blue-300', 'text-red-300');
-            } else {
-                pasteBtn.innerHTML = '📋 Paste';
-                pasteBtn.classList.replace('text-red-300', 'text-blue-300');
-            }
-        }
+/* ---------- settings drawer ---------- */
+var settingsToggle = document.getElementById("settingsToggle");
+var settingsBody = document.getElementById("settingsBody");
+function setDrawer(open){
+  settingsBody.hidden = !open;
+  settingsToggle.classList.toggle("open", open);
+}
+settingsToggle.addEventListener("click", function(){ setDrawer(settingsBody.hidden); });
 
-        async function handlePasteOrClear() {
-            if (urlInput.value.trim().length > 0) {
-                urlInput.value = '';
-                resultBox.classList.add('hidden');
-                updatePasteButton();
-                urlInput.focus();
-            } else {
-                try {
-                    const text = await navigator.clipboard.readText();
-                    urlInput.value = text;
-                    urlInput.dispatchEvent(new Event('input'));
-                } catch (err) {
-                    alert('ব্রাউজার থেকে অটো-পেস্ট ব্লক করা আছে, দয়া করে ম্যানুয়ালি পেস্ট করুন।');
-                }
-            }
-        }
+function loadSettings(){
+  try{
+    document.getElementById("instanceUrl").value = localStorage.getItem("cobalt_instance_url") || "";
+    document.getElementById("instanceKey").value = localStorage.getItem("cobalt_instance_key") || "";
+  }catch(e){}
+}
+document.getElementById("saveSettingsBtn").addEventListener("click", function(){
+  try{
+    localStorage.setItem("cobalt_instance_url", document.getElementById("instanceUrl").value.trim());
+    localStorage.setItem("cobalt_instance_key", document.getElementById("instanceKey").value.trim());
+  }catch(e){}
+  setDrawer(false);
+  toast("সেভ হয়েছে।");
+});
+loadSettings();
+setDrawer(!document.getElementById("instanceUrl").value);
 
-        function setPlatform(platform, btn, clearInput = false) {
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
+/* ---------- quality chips ---------- */
+var quality = "1080";
+document.querySelectorAll(".qchip").forEach(function(chip){
+  chip.addEventListener("click", function(){
+    document.querySelectorAll(".qchip").forEach(function(c){ c.classList.remove("sel"); });
+    chip.classList.add("sel");
+    quality = chip.dataset.q;
+  });
+});
 
-            const placeholders = {
-                youtube: 'https://www.youtube.com/watch?v=...',
-                tiktok: 'https://www.tiktok.com/@user/video/...',
-                instagram: 'https://www.instagram.com/reel/...',
-                facebook: 'https://www.facebook.com/watch/?v=...'
-            };
-            urlInput.placeholder = placeholders[platform] || 'ভিডিওর লিংক পেস্ট করুন...';
-            if (clearInput) {
-                urlInput.value = '';
-                updatePasteButton();
-            }
-        }
+/* ---------- tiny toast via result-less inline alert replacement ---------- */
+function toast(msg){
+  var t = document.createElement("div");
+  t.textContent = msg;
+  t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(10,40,32,.94);border:1px solid rgba(0,215,147,.4);color:#eef7f2;padding:11px 18px;border-radius:13px;font-size:13px;font-weight:600;z-index:99;box-shadow:0 12px 30px -10px rgba(0,0,0,.6)";
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2400);
+}
 
-        async function startDownloadProcess() {
-            const link = urlInput.value.trim();
-            if (!link || !link.startsWith('http')) {
-                alert('দয়া করে একটি সঠিক ভিডিওর লিংক দিন!');
-                return;
-            }
+/* ====================================================================
+   এই ডাউনলোডার cobalt (https://github.com/wukko/cobalt) ব্যবহার করে —
+   ওপেন-সোর্স, ফ্রি, ২০+ প্ল্যাটফর্ম সাপোর্ট করে। cobalt-এর নিজস্ব পাবলিক
+   instance (api.cobalt.tools) অন্য প্রজেক্টে সরাসরি ব্যবহারের অনুমতি দেয়
+   না, তাই উপরের সেটিংসে নিজের instance URL বসাতে হবে:
+     ১) নিজে হোস্ট করো — github.com/wukko/cobalt (Docker, ফ্রি)
+     ২) দ্রুত টেস্ট — instances.cobalt.best থেকে API URL বেছে নাও
+==================================================================== */
 
-            fetchBtn.disabled = true;
-            fetchBtn.innerHTML = `<span class="animate-spin">⏳</span> <span>Processing...</span>`;
-            resultBox.classList.remove('hidden');
-            resultContent.innerHTML = `
-                <div class="py-4 space-y-2">
-                    <div class="text-4xl animate-bounce">⚙️</div>
-                    <h3 class="text-base font-bold text-blue-300">ভিডিও ফাইল খোঁজা হচ্ছে...</h3>
-                    <p class="text-xs text-gray-400">Apify ক্লাউড সার্ভার থেকে ডাউনলোড লিংক তৈরি হচ্ছে (১০-১৫ সেকেন্ড সময় লাগতে পারে)</p>
-                </div>
-            `;
+var fetchBtn = document.getElementById("fetchBtn");
+var resultBox = document.getElementById("resultBox");
+var resultContent = document.getElementById("resultContent");
 
-            const endpoint = `https://api.apify.com/v2/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`;
+fetchBtn.addEventListener("click", fetchVideo);
+document.getElementById("videoUrl").addEventListener("keydown", function(e){ if(e.key === "Enter") fetchVideo(); });
 
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        url: link,
-                        proxySettings: {
-                            useApifyProxy: true,
-                            apifyProxyGroups: ["RESIDENTIAL"],
-                            apifyProxyCountry: "CA"
-                        },
-                        mergeAV: true
-                    })
-                });
+async function fetchVideo(){
+  var urlInput = document.getElementById("videoUrl").value.trim();
+  var instanceUrl = document.getElementById("instanceUrl").value.trim().replace(/\/+$/,"");
+  var instanceKey = document.getElementById("instanceKey").value.trim();
 
-                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+  if(!urlInput){ toast("একটা ভিডিও লিংক দাও।"); return; }
+  if(!instanceUrl){ toast("আগে cobalt instance URL বসাও।"); setDrawer(true); return; }
 
-                const data = await response.json();
-                if (!data || data.length === 0) throw new Error('No media found');
+  fetchBtn.disabled = true;
+  resultBox.hidden = false;
+  resultContent.innerHTML =
+    '<div class="spinner"></div>' +
+    '<h3 class="bn">ভিডিও খোঁজা হচ্ছে...</h3>' +
+    '<p class="meta bn">এতে কয়েক সেকেন্ড সময় লাগতে পারে</p>';
+  resultBox.scrollIntoView({behavior:"smooth", block:"nearest"});
 
-                parseAndDisplayMedia(data[0], link);
+  var headers = { "Accept": "application/json", "Content-Type": "application/json" };
+  if(instanceKey) headers["Authorization"] = instanceKey;
 
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                resultContent.innerHTML = `
-                    <div class="p-2 space-y-3">
-                        <div class="text-3xl">⚠️</div>
-                        <h3 class="text-base font-bold text-amber-400">সরাসরি ফেচ করা সম্ভব হয়নি</h3>
-                        <p class="text-xs text-gray-300">ভিডিওটি প্রাইভেট হতে পারে অথবা সার্ভার ব্যস্ত আছে। নিচের বিকল্প সার্ভার থেকে ডাউনলোড করুন:</p>
-                        <a href="https://en.savefrom.net/#url=${encodeURIComponent(link)}" target="_blank" rel="noopener"
-                           class="block w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
-                           🚀 Download via Backup Server
-                        </a>
-                    </div>
-                `;
-            } finally {
-                fetchBtn.disabled = false;
-                fetchBtn.innerHTML = `<span>⚡ Get Video & Audio</span>`;
-            }
-        }
+  try{
+    var res = await fetch(instanceUrl + "/", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({ url: urlInput, videoQuality: quality, downloadMode: "auto", filenameStyle: "pretty" })
+    });
+    var data = await res.json().catch(function(){ return null; });
+    console.log("cobalt raw result:", data);
+    if(!data) throw new Error("সার্ভার থেকে বৈধ JSON রেসপন্স আসেনি (স্ট্যাটাস " + res.status + ")।");
+    renderResult(data, urlInput);
+  }catch(err){
+    console.error(err);
+    resultContent.innerHTML =
+      '<div class="glyph">❌</div>' +
+      '<h3 class="bn" style="color:var(--danger)">ফেচ করা যায়নি</h3>' +
+      '<p class="meta">' + escapeHtml(err.message || "অজানা এরর") + '</p>' +
+      '<div class="note bn"><span>⚠️</span><span>instance URL ঠিক আছে কিনা দেখো, আর F12 কনসোলে CORS এরর আসছে কিনা চেক করো। CORS ব্লক হলে ওই instance browser থেকে সরাসরি কল করতে দিচ্ছে না — অন্য instance ট্রাই করো বা নিজের instance হোস্ট করো।</span></div>';
+  }finally{
+    fetchBtn.disabled = false;
+  }
+}
 
-        function parseAndDisplayMedia(item, originalUrl) {
-            const title = item.title || item.description || 'Social Media Video';
-            const thumb = item.thumbnail || item.thumb || item.picture || '';
-            let downloadOptions = [];
+function renderResult(data, originalUrl){
+  if(data.status === "error"){
+    var code = (data.error && data.error.code) || "unknown";
+    resultContent.innerHTML =
+      '<div class="glyph">⚠️</div>' +
+      '<h3 class="bn">cobalt এরর দিয়েছে</h3>' +
+      '<p class="meta">' + escapeHtml(code) + '</p>' +
+      '<div class="note bn"><span>ℹ️</span><span>এই প্ল্যাটফর্ম/লিংক সাপোর্ট করছে না, instance-এ key লাগছে, বা ভিডিওটা প্রাইভেট/অনেক বড়।</span></div>';
+    return;
+  }
 
-            // Extract formats/medias array if provided by Apify actor
-            if (Array.isArray(item.medias) && item.medias.length > 0) {
-                item.medias.forEach(m => {
-                    if (m.url) {
-                        downloadOptions.push({
-                            label: `${m.quality || m.extension || 'Video'} (${m.extension ? m.extension.toUpperCase() : 'MP4'})`,
-                            url: m.url,
-                            ext: m.extension || 'mp4',
-                            isAudio: m.audioAvailable && !m.videoAvailable
-                        });
-                    }
-                });
-            } else if (Array.isArray(item.formats) && item.formats.length > 0) {
-                item.formats.forEach(f => {
-                    if (f.url) {
-                        downloadOptions.push({
-                            label: `${f.format || f.quality || 'Download'} (${f.ext || 'mp4'})`,
-                            url: f.url,
-                            ext: f.ext || 'mp4',
-                            isAudio: false
-                        });
-                    }
-                });
-            }
-
-            // Fallback to single direct URL properties
-            if (downloadOptions.length === 0) {
-                const directUrl = item.url || item.videoUrl || item.downloadUrl || item.hd || item.sd;
-                if (directUrl) {
-                    downloadOptions.push({
-                        label: 'Download HD Video (MP4)',
-                        url: directUrl,
-                        ext: 'mp4',
-                        isAudio: false
-                    });
-                }
-            }
-
-            if (downloadOptions.length === 0) {
-                throw new Error('No valid download URLs in response');
-            }
-
-            const thumbHtml = thumb 
-                ? `<img src="${escapeHtml(thumb)}" alt="Thumbnail" class="w-full h-44 object-cover rounded-2xl border border-white/10 shadow-md">` 
-                : '';
-
-            const buttonsHtml = downloadOptions.slice(0, 5).map((opt, idx) => {
-                const safeFilename = `Sadik-Tools-${Date.now()}.${opt.ext}`;
-                const btnColor = opt.isAudio 
-                    ? 'from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500' 
-                    : 'from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500';
-                const icon = opt.isAudio ? '🎵' : '⬇️';
-
-                return `
-                    <button type="button" onclick="forceDirectDownload(this, '${escapeAttr(opt.url)}', '${safeFilename}')"
-                        class="w-full py-3.5 px-4 rounded-xl font-bold text-white text-sm bg-gradient-to-r ${btnColor} shadow-lg transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
-                        <span>${icon}</span>
-                        <span>${escapeHtml(opt.label)}</span>
-                    </button>
-                `;
-            }).join('');
-
-            resultContent.innerHTML = `
-                <div class="space-y-4 text-left">
-                    ${thumbHtml}
-                    <div>
-                        <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">● Ready to Download</span>
-                        <h3 class="text-sm md:text-base font-semibold text-white line-clamp-2 mt-0.5">${escapeHtml(title)}</h3>
-                    </div>
-                    <div class="space-y-2.5 pt-1">
-                        ${buttonsHtml}
-                    </div>
-                    <p class="text-[11px] text-gray-400 text-center pt-1">ডাউনলোড শুরু না হলে বাটনে চেপে ধরে "Download Link" সিলেক্ট করুন।</p>
-                </div>
-            `;
-        }
-
-        // Smart Blob Downloader to force file save instead of tab redirect
-        async function forceDirectDownload(btnElement, fileUrl, filename) {
-            const originalHtml = btnElement.innerHTML;
-            btnElement.disabled = true;
-            btnElement.innerHTML = `<span class="animate-spin">⏳</span> <span>Downloading File...</span>`;
-
-            try {
-                const res = await fetch(fileUrl);
-                if (!res.ok) throw new Error('Network blocked');
-                
-                const blob = await res.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-                btnElement.innerHTML = `<span>✅</span> <span>Saved to Device!</span>`;
-            } catch (err) {
-                // If CDN strictly blocks XHR/Fetch via CORS, trigger native browser download anchor
-                const a = document.createElement('a');
-                a.href = fileUrl;
-                a.setAttribute('download', filename);
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                btnElement.innerHTML = `<span>↗️</span> <span>Opened Direct Stream</span>`;
-            } finally {
-                setTimeout(() => {
-                    btnElement.disabled = false;
-                    btnElement.innerHTML = originalHtml;
-                }, 3000);
-            }
-        }
-
-        function escapeHtml(str) {
-            return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-        }
-
-        function escapeAttr(str) {
-            return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        }
-
-        // Interactive Background Canvas
-        const glowBall = document.getElementById('bg-glow-ball');
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2, radius: 220 };
-
-        function updatePointer(x, y) {
-            pointer.x = x;
-            pointer.y = y;
-            if (glowBall) {
-                glowBall.style.left = x + 'px';
-                glowBall.style.top = y + 'px';
-            }
-        }
-
-        window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
-        window.addEventListener('touchmove', e => { if (e.touches.length > 0) updatePointer(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
-
-        
+  if(data.status === "redirect" || data.status === "tunnel"){
+    resultContent.innerHTML =
+      '<div class="glyph">✅</div>' +
+      '<h3 class="bn">ভিডিও পাওয়া গেছে!</h3>' +
+      '<p class="meta">সোর্স: ' + escapeHtml(originalUrl) + '</p>' +
+      '<a class="dlbtn" href="' + data.url + '" target="
