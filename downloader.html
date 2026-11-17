@@ -238,7 +238,11 @@ footer a{ color: var(--text-lo); }
         <input type="text" id="instanceKey" placeholder="Api-Key xxxxxxxx">
       </div>
       <p class="hint bn">নিজের ফ্রি instance চালাতে <a href="https://github.com/wukko/cobalt" target="_blank" rel="noopener">github.com/wukko/cobalt</a> দেখো, অথবা টেস্টের জন্য <a href="https://instances.cobalt.best" target="_blank" rel="noopener">instances.cobalt.best</a> থেকে <b>API URL</b> (frontend URL না) কপি করে বসাও।</p>
-      <button type="button" class="btn ghost tap" id="saveSettingsBtn">সেভ করো</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" class="btn ghost tap" id="saveSettingsBtn" style="flex:1">সেভ করো</button>
+        <button type="button" class="btn ghost tap" id="testInstanceBtn" style="flex:1">🔧 ইনস্ট্যান্স টেস্ট করো</button>
+      </div>
+      <div id="testResult"></div>
     </div>
   </div>
 
@@ -352,6 +356,41 @@ document.getElementById("saveSettingsBtn").addEventListener("click", function(){
 loadSettings();
 setDrawer(!document.getElementById("instanceUrl").value);
 
+/* ---------- instance self-test: no devtools needed, works on phones ---------- */
+document.getElementById("testInstanceBtn").addEventListener("click", async function(){
+  var box = document.getElementById("testResult");
+  var instanceUrl = document.getElementById("instanceUrl").value.trim().replace(/\/+$/,"");
+  if(!instanceUrl){ box.innerHTML = '<div class="note bn"><span>⚠️</span><span>আগে instance URL বসাও।</span></div>'; return; }
+
+  box.innerHTML = '<div class="note bn"><span>⏳</span><span>টেস্ট চলছে...</span></div>';
+  var lines = [];
+  try{
+    var t0 = performance.now();
+    var res = await fetch(instanceUrl + "/", { method: "GET", headers: { "Accept": "application/json" } });
+    var ms = Math.round(performance.now() - t0);
+    var text = await res.text();
+    var json = null;
+    try{ json = JSON.parse(text); }catch(e){}
+
+    lines.push("স্ট্যাটাস: " + res.status + " (" + ms + "ms)");
+    if(json && json.cobalt){
+      lines.push("✅ এটা একটা আসল cobalt API — version " + (json.cobalt.version || "?"));
+      if(json.cobalt.services) lines.push("সাপোর্টেড সার্ভিস: " + Object.keys(json.cobalt.services).join(", "));
+      box.innerHTML = '<div class="note bn" style="border-color:rgba(0,215,147,.35);background:rgba(0,215,147,.08);color:#9af0d4"><span>✅</span><span>' + lines.join("<br>") + '</span></div>';
+    } else if(json) {
+      lines.push("⚠️ JSON এসেছে কিন্তু এটা cobalt API-এর ফরম্যাট না — সম্ভবত এটা ভুল URL (frontend হতে পারে)।");
+      box.innerHTML = '<div class="note bn"><span>⚠️</span><span>' + lines.join("<br>") + '</span></div><div class="rawbox">' + escapeHtml(text).slice(0,800) + '</div>';
+    } else {
+      lines.push("❌ এটা JSON না, মানে এটা cobalt-এর ওয়েবসাইট (HTML frontend), API endpoint না। instances.cobalt.best-এ গিয়ে ঠিক API URL খুঁজে বসাও।");
+      box.innerHTML = '<div class="note bn"><span>❌</span><span>' + lines.join("<br>") + '</span></div><div class="rawbox">' + escapeHtml(text).slice(0,400) + '</div>';
+    }
+  }catch(err){
+    box.innerHTML =
+      '<div class="note bn"><span>❌</span><span><b>কানেক্ট করা যায়নি:</b> ' + escapeHtml(err.message || "network error") +
+      '<br><br>এর মানে সাধারণত হয় — (১) URL ভুল/instance বন্ধ, অথবা (২) এই instance CORS দিয়ে ব্রাউজার থেকে সরাসরি কল ব্লক করে রেখেছে (অনেক instance শুধু নিজের frontend থেকে কল এক্সেপ্ট করে)। এমন হলে এই instance কাজ করবে না — অন্যটা ট্রাই করো।</span></div>';
+  }
+});
+
 /* ---------- quality chips ---------- */
 var quality = "1080";
 document.querySelectorAll(".qchip").forEach(function(chip){
@@ -387,61 +426,4 @@ var resultContent = document.getElementById("resultContent");
 fetchBtn.addEventListener("click", fetchVideo);
 document.getElementById("videoUrl").addEventListener("keydown", function(e){ if(e.key === "Enter") fetchVideo(); });
 
-async function fetchVideo(){
-  var urlInput = document.getElementById("videoUrl").value.trim();
-  var instanceUrl = document.getElementById("instanceUrl").value.trim().replace(/\/+$/,"");
-  var instanceKey = document.getElementById("instanceKey").value.trim();
-
-  if(!urlInput){ toast("একটা ভিডিও লিংক দাও।"); return; }
-  if(!instanceUrl){ toast("আগে cobalt instance URL বসাও।"); setDrawer(true); return; }
-
-  fetchBtn.disabled = true;
-  resultBox.hidden = false;
-  resultContent.innerHTML =
-    '<div class="spinner"></div>' +
-    '<h3 class="bn">ভিডিও খোঁজা হচ্ছে...</h3>' +
-    '<p class="meta bn">এতে কয়েক সেকেন্ড সময় লাগতে পারে</p>';
-  resultBox.scrollIntoView({behavior:"smooth", block:"nearest"});
-
-  var headers = { "Accept": "application/json", "Content-Type": "application/json" };
-  if(instanceKey) headers["Authorization"] = instanceKey;
-
-  try{
-    var res = await fetch(instanceUrl + "/", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({ url: urlInput, videoQuality: quality, downloadMode: "auto", filenameStyle: "pretty" })
-    });
-    var data = await res.json().catch(function(){ return null; });
-    console.log("cobalt raw result:", data);
-    if(!data) throw new Error("সার্ভার থেকে বৈধ JSON রেসপন্স আসেনি (স্ট্যাটাস " + res.status + ")।");
-    renderResult(data, urlInput);
-  }catch(err){
-    console.error(err);
-    resultContent.innerHTML =
-      '<div class="glyph">❌</div>' +
-      '<h3 class="bn" style="color:var(--danger)">ফেচ করা যায়নি</h3>' +
-      '<p class="meta">' + escapeHtml(err.message || "অজানা এরর") + '</p>' +
-      '<div class="note bn"><span>⚠️</span><span>instance URL ঠিক আছে কিনা দেখো, আর F12 কনসোলে CORS এরর আসছে কিনা চেক করো। CORS ব্লক হলে ওই instance browser থেকে সরাসরি কল করতে দিচ্ছে না — অন্য instance ট্রাই করো বা নিজের instance হোস্ট করো।</span></div>';
-  }finally{
-    fetchBtn.disabled = false;
-  }
-}
-
-function renderResult(data, originalUrl){
-  if(data.status === "error"){
-    var code = (data.error && data.error.code) || "unknown";
-    resultContent.innerHTML =
-      '<div class="glyph">⚠️</div>' +
-      '<h3 class="bn">cobalt এরর দিয়েছে</h3>' +
-      '<p class="meta">' + escapeHtml(code) + '</p>' +
-      '<div class="note bn"><span>ℹ️</span><span>এই প্ল্যাটফর্ম/লিংক সাপোর্ট করছে না, instance-এ key লাগছে, বা ভিডিওটা প্রাইভেট/অনেক বড়।</span></div>';
-    return;
-  }
-
-  if(data.status === "redirect" || data.status === "tunnel"){
-    resultContent.innerHTML =
-      '<div class="glyph">✅</div>' +
-      '<h3 class="bn">ভিডিও পাওয়া গেছে!</h3>' +
-      '<p class="meta">সোর্স: ' + escapeHtml(originalUrl) + '</p>' +
-      '<a class="dlbtn" href="' + data.url + '" target="
+async function f
